@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="ja">
 <head>
@@ -830,8 +831,8 @@
   const FALLBACK = [["c010","ラピ"],["c010_02","ラピ ホワイトプロミス"],["c011","ネオン"],["c012","アニス"],["c016","ラピ：レッドフード"],
     ["c017","アニス：スター"],["c020","デルタ"],["c032","ミランダ"],["c070","ブリッド"],["c220","スノーホワイト"],["c310","エード"],["c311","ココア"],["c312","ソーダ"],["c350","マスト"],["c351","アンカー"]];
 
-  const settings = Object.assign({ slots: null, fmt: '24', secs: '1', pos: 'bl', bg: 'night', glass: '1',
-    showName: '1', floorOn: '1', shuffle: '0', glitch: '1', expr: 'rand', solo: '1', pairs: {}, groups: {}, sizeMap: {}, cdesign: 'glass', csize: 100, cpos: 'bl', cdx: 0, cdy: 0, cal: '1', yMap: {}, xMap: {}, frontSlot: -1, kshape: 'month', kwidth: 100, combat: '1', footMode: 'ground', water: '1', combatStyle: 'reload', aimPhys: '1', jiggle: 100, kmode: 'attach', kpos: 'br', kdx: 0, kdy: 0, ksize: 100, kbg: 'panel', fxMap: {}, reflMap: {}, footMap: {}, favs: [], anim: {} }, store.get('settings', {}));
+  const settings = Object.assign({ slots: null, fmt: '24', secs: '1', pos: 'tl', bg: 'night', glass: '1',
+    showName: '1', floorOn: '1', shuffle: '0', glitch: '1', expr: 'rand', solo: '1', pairs: {}, groups: {}, sizeMap: {}, cdesign: 'hud', csize: 100, cpos: 'tl', cdx: 0, cdy: 0, cal: '1', yMap: {}, xMap: {}, frontSlot: -1, kshape: 'strip', kwidth: 100, combat: '1', footMode: 'ground', water: '1', combatStyle: 'reload', aimPhys: '1', jiggle: 100, kmode: 'free', kpos: 'br', kdx: 0, kdy: 0, ksize: 100, kbg: 'panel', fxMap: {}, reflMap: {}, footMap: {}, favs: [], anim: {} }, store.get('settings', {}));
   if (settings.pos && !settings.cposSet) { settings.cpos = { bl: 'bl', br: 'br', tl: 'tl', tr: 'tr' }[settings.pos] || 'bl'; }
   if (settings.glass === '0' && !settings.cposSet) settings.cdesign = 'mini';
   // 旧ペア設定 → 新グループ設定
