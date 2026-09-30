@@ -2106,8 +2106,8 @@
     const m = head.match(/4\.(\d)\.\d+/);
     return m ? '4.' + m[1] : '4.1';
   }
-  async function createPlayer(item, s) {
-    const base = fileBase(item);
+  async function createPlayer(item, s, variant) {
+    const base = variant === 'reload' ? coverBase(item[0]) : fileBase(item);
     const spine = await getRuntime(await detectVersion(base + '.skel'));
     const host = document.createElement('div'); host.className = 'pending';
     s.hostsEl.appendChild(host);
@@ -2120,12 +2120,21 @@
         success: p => {
           const names = p.skeleton.data.animations.map(a => a.name);
           const saved = settings.anim[item[0]];
-          const pick = names.includes(saved) ? saved : (names.find(n => /^idle$/i.test(n)) || names.find(n => /idle/i.test(n)) || names[0]);
-          if (pick) p.setAnimation(pick, true);
+          let pick = names.includes(saved) ? saved : (names.find(n => /^idle$/i.test(n)) || names.find(n => /idle/i.test(n)) || names[0]);
+          let seq = null;
+          if (variant === 'reload') {   // リロード：カバー用モデルの動きを順に1回ずつ。姿を見せるまでは止めておく（時間0倍速）
+            seq = reloadSeq(names);
+            if (!seq.length) { try { p.dispose(); } catch {} host.remove(); reject(new Error('リロードのモーションがありません')); return; }
+            pick = seq[0]; p.setAnimation(seq[0], false);
+            seq.slice(1).forEach(n => p.animationState.addAnimation(0, n, false, 0));
+            p.animationState.timeScale = 0;
+          } else if (pick) p.setAnimation(pick, true);
           p.play();
           hideParts(p, item[0]);
           const v = p.currentViewport || {};
-          const c = { player: p, host, names, pick, item, bounds: { x: v.x, y: v.y, width: v.width, height: v.height } };
+          const c = { player: p, host, names, pick, item, bounds: { x: v.x, y: v.y, width: v.width, height: v.height }, variant: variant || null, seq,
+            refH: variant === 'reload' && s.cur ? (s.cur.refH || s.cur.bounds.height) : 0,   // リロード姿は、立ち姿と同じ縮尺で（高さをそろえると大きく見えてしまう）
+            reloadMs: seq ? seq.reduce((t, n) => t + (p.skeleton.data.findAnimation(n)?.duration || 0) * 1000, 0) : 0 };
           fitPlayer(s, c);
           resolve(c);
         },
@@ -2137,7 +2146,7 @@
   function ownScale(s, c) {
     const B = c && c.bounds; if (!B || !B.width || !B.height) return Infinity;
     const H = c.host.clientHeight, Ws = s.el.clientWidth; if (!H || !Ws) return Infinity;
-    return Math.min(H * 0.95 / B.height, Ws * 1.12 / B.width);   // 高さいっぱい、横は枠を少しはみ出すまで
+    return Math.min(H * 0.95 / (c.refH || B.height), Ws * 1.12 / B.width);   // 高さいっぱい、横は枠を少しはみ出すまで
   }
   // キャラの大きさ・位置に合わせて、絵を描く領域（キャンバス）を広げる
   //  ふだんは枠の130%幅。はみ出すほど大きく／横にずらしたときは画面の横幅いっぱい＋上方向にも伸ばす
@@ -2177,7 +2186,7 @@
   function refitAll() {
     applyDrop();
     const shown = slots.filter(s => s.cur && s.cur.bounds && visible(s));
-    const ks = shown.map(s => s.el.clientHeight * 0.88 / s.cur.bounds.height * sizeOf(s.cur.item[0]) / 100);
+    const ks = shown.map(s => s.el.clientHeight * 0.88 / (s.cur.refH || s.cur.bounds.height) * sizeOf(s.cur.item[0]) / 100);
     // 横に収まらないときの縮小は「サイズ100%」基準で計算（拡大したキャラは枠からはみ出してOK）
     const f = Math.min(1, ...shown.map((s, i) => s.el.clientWidth * 1.12 / (s.cur.bounds.width * ks[i] * 100 / sizeOf(s.cur.item[0]))));
     shown.forEach((s, i) => { sizeHosts(s, ks[i] * f); applyScale(s.cur, ks[i] * f); });
@@ -2234,7 +2243,7 @@
     refitAll();
   }
 
-  async function switchTo(idx, item, animate = true) {
+  async function switchTo(idx, item, animate = true, variant = null) {
     const s = slots[idx]; if (!s) return;
     const token = ++s.token;
     const t0 = performance.now();
@@ -2242,7 +2251,7 @@
     const isGlitch = GLITCHES.includes(fx), isCute = fx === 'cute';
     if (isGlitch) startGlitch(s, fx); else if (isCute) startCute(s); else s.el.classList.add('busy');
     try {
-      const next = await createPlayer(item, s);
+      const next = await createPlayer(item, s, variant);
       if (token !== s.token) { try { next.player.dispose(); } catch {} next.host.remove(); return; }
       if (isGlitch || isCute) await sleep(Math.max(0, (isCute ? 550 : 450) - (performance.now() - t0)));
       const old = s.cur;
@@ -2251,6 +2260,11 @@
       await snapFeet(next);
       next.host.classList.remove('pending');
       if (old) { try { old.player.dispose(); } catch {} old.host.remove(); }
+      if (variant === 'reload') {          // 姿が出たところからリロード開始。終わったら自動でもう一度演出して待機に戻る
+        next.player.animationState.timeScale = 1;
+        clearTimeout(s.reloadT);
+        s.reloadT = setTimeout(() => { if (s.cur === next && slots[idx] === s) switchTo(idx, item, true, null); else s.reloadBusy = false; }, next.reloadMs + 500);
+      } else s.reloadBusy = false;
       if (isCute) {
         s.el.classList.remove('cute-out');
         next.host.classList.add('pop'); setTimeout(() => next.host.classList.remove('pop'), 700);
@@ -2266,7 +2280,7 @@
       if (isGlitch) await sleep(380);
       if (isCute) await sleep(650);
     } catch (e) {
-      if (token === s.token) status('読み込めませんでした：' + e.message);
+      if (token === s.token) { status('読み込めませんでした：' + e.message); s.reloadBusy = false; }
     } finally {
       if (token === s.token) { stopGlitch(s); stopCute(s); s.el.classList.remove('busy'); }
     }
@@ -2287,7 +2301,13 @@
       const c = s.cur;
       if (!c || now < s.nextExpr || s.glitchOn) return;
       s.nextExpr = Date.now() + (settings.expr === 'rand' ? rnd(18, 50) : +settings.expr) * 1000;
-      // 表情の候補：待機・会話・切り替え用・怒り顔以外の動き（expression_0 / delight / shy / think など）
+      playExpr(s);
+    });
+  }
+  // 表情を1回だけ重ねて再生（ときどき自動／キャラを1回タップ）
+  function playExpr(s) {
+    const c = s.cur; if (!c || c.variant) return;
+    // 表情の候補：待機・会話・切り替え用・怒り顔以外の動き（expression_0 / delight / shy / think など）
       const pool = c.names.filter(n => n !== c.pick && !/^idle$|talk|^to_|^aim|^cover|reload|hit|stun|angry/i.test(n));
       if (!pool.length) return;
       // shy（照れ顔）は他の表情の3倍出やすくする
@@ -2300,8 +2320,51 @@
       st.setEmptyAnimation(1, 0);
       const e1 = st.addAnimation(1, pick, false, 0); if (e1) e1.mixDuration = 0.35;
       st.addEmptyAnimation(1, 0.45, 0);
-    });
   }
+
+  // ---------- キャラをタップ：1回＝表情／2回＝リロードのモーション（あるキャラだけ） ----------
+  const reloadSeq = names => names.includes('cover_reload') ? ['cover_reload'] : ['cover_reload_start', 'cover_reload_loop', 'cover_reload_end'].filter(n => names.includes(n));
+  const reloadMemo = {};
+  async function hasReloadMotion(id) {          // カバー用モデルの中に cover_reload があるかを、ファイルの中の文字で確かめる
+    if (id in reloadMemo) return reloadMemo[id];
+    let ok = false;
+    try { const t = new TextDecoder('latin1').decode(new Uint8Array(await (await fetch(coverBase(id) + '.skel')).arrayBuffer())); ok = !t.startsWith('<!') && /cover_reload/.test(t); } catch {}
+    return reloadMemo[id] = ok;
+  }
+  async function doReload(s) {
+    const c = s.cur, idx = slots.indexOf(s); if (!c || c.variant || s.reloadBusy || s.glitchOn || idx < 0) return;
+    s.reloadBusy = true;
+    if (!(await hasReloadMotion(c.item[0]))) { s.reloadBusy = false; status('このキャラにはリロードのモーションがありません'); setTimeout(() => status(''), 1800); return; }
+    await switchTo(idx, c.item, true, 'reload');      // 選んでいる切替演出 → リロード → （自動で）演出 → 待機
+  }
+  const tapHitCv = document.createElement('canvas'); tapHitCv.width = tapHitCv.height = 1;
+  const tapHitCx = tapHitCv.getContext('2d', { willReadFrequently: true });
+  function hitChar(s, x, y) {                        // 絵のある（透けていない）ところをタップしたか
+    const cv = s.cur && s.cur.host.querySelector('canvas'); if (!cv || !cv.width) return false;
+    const r = cv.getBoundingClientRect(); if (x < r.left || x > r.right || y < r.top || y > r.bottom) return false;
+    try {
+      tapHitCx.clearRect(0, 0, 1, 1);
+      tapHitCx.drawImage(cv, Math.floor((x - r.left) / r.width * cv.width), Math.floor((y - r.top) / r.height * cv.height), 1, 1, 0, 0, 1, 1);
+      return tapHitCx.getImageData(0, 0, 1, 1).data[3] > 40;
+    } catch { return false; }
+  }
+  (() => {
+    const st = $('#stage'); let d = null, pending = 0, last = { s: null, t: 0 };
+    const blocked = () => body.classList.contains('edit') || body.classList.contains('pair-edit') || body.classList.contains('combat') || body.classList.contains('panel-open');
+    st.addEventListener('pointerdown', e => { d = (blocked() || e.button) ? null : { x: e.clientX, y: e.clientY, t: performance.now() }; });
+    st.addEventListener('pointermove', e => { if (d && Math.hypot(e.clientX - d.x, e.clientY - d.y) > 10) d = null; });
+    st.addEventListener('pointercancel', () => { d = null; });
+    st.addEventListener('pointerup', e => {
+      const p = d; d = null; if (!p || performance.now() - p.t > 450 || blocked()) return;
+      const shown = slots.filter(x => x.cur && visible(x)), front = shown.filter(x => !x.el.classList.contains('back')), back = shown.filter(x => x.el.classList.contains('back'));
+      const s = front.concat(back).find(x => hitChar(x, e.clientX, e.clientY)); if (!s) return;
+      const now = performance.now();
+      if (last.s === s && now - last.t < 320) { clearTimeout(pending); last = { s: null, t: 0 }; doReload(s); return; }   // 2回タップ
+      last = { s, t: now };
+      clearTimeout(pending);
+      pending = setTimeout(() => { last = { s: null, t: 0 }; if (s.cur && !s.cur.variant && !s.reloadBusy && !s.glitchOn) playExpr(s); }, 320);   // 1回タップ
+    });
+  })();
 
   // ---------- 射撃演出（x9分55秒から10分の位を撃って、00で切り替わる） ----------
   const aimBase = id => `${L2D}${id}/aim/${id}_aim_00`;
