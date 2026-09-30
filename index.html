@@ -732,7 +732,7 @@
   #asmr .jbLogo { color: #ff8fd0; text-shadow: 0 0 12px rgba(255,120,200,.6); }
   #vGrid { flex: 1; overflow-y: auto; padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; align-content: start; }
   .vCard { cursor: pointer; position: relative; }
-  .vCard .vThumb { aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #0b1322 center / cover no-repeat; border: 1px solid rgba(255,143,208,.3); position: relative; transition: box-shadow .15s, transform .15s; }
+  .vCard .vThumb { aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: linear-gradient(135deg, #1a2440, #3a1f45) center / cover no-repeat; border: 1px solid rgba(255,143,208,.3); position: relative; transition: box-shadow .15s, transform .15s; }
   .vCard:hover .vThumb { transform: translateY(-2px); box-shadow: 0 0 16px rgba(255,143,208,.5); }
   .vCard .vThumb::after { content: "▶"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 26px; color: #fff; text-shadow: 0 0 12px rgba(0,0,0,.8); opacity: .0; transition: opacity .15s; }
   .vCard:hover .vThumb::after { opacity: .9; }
@@ -1031,7 +1031,7 @@
 <div id="asmr">
   <div class="jbWin">
     <div class="jbHead">
-      <span class="jbLogo">ASMR</span><span class="jbSub">VIDEO LIBRARY // この端末に保存</span>
+      <span class="jbLogo">ASMR</span><span class="jbSub">VIDEO LIBRARY</span>
       <button class="jbX" id="asmrClose" title="閉じる">✕</button>
     </div>
     <div id="vGrid"></div>
@@ -1040,7 +1040,7 @@
       <input type="file" id="vFile" accept="video/*,.mp4,.mov,.m4v,.webm" multiple style="display:none">
       <input id="vUrl" type="text" placeholder="動画のURL（GitHubに置いた mp4 など）を貼って追加">
       <button id="vAddUrl">URLで追加</button>
-      <div class="note" id="vNote"><b>ASMR</b><span>動画をタップで再生。追加したファイルはこの端末（ブラウザ）に保存され、次回もすぐ選べます</span></div>
+      <div class="note" id="vNote"><b>ASMR</b><span>動画をタップで再生。「共通」は誰が開いても出る動画、自分で追加したものはこの端末だけに出ます</span></div>
     </div>
   </div>
 </div>
@@ -3341,6 +3341,19 @@
   const vtx = async (mode, fn) => { const db = await vdb(); return new Promise((res, rej) => { const t = db.transaction('videos', mode); const st = t.objectStore('videos'); const out = fn(st); t.oncomplete = () => res(out && out.result !== undefined ? out.result : out); t.onerror = () => rej(t.error); }); };
   const vAll = async () => { try { return await vtx('readonly', st => st.getAll()); } catch { return []; } };
   let vList = [], vCur = null, vUrlObj = null;
+  // 全員共通の動画リスト：同じ場所に置いた asmr-videos.json を読む（GitHub Pages なら誰が開いても同じ一覧になる）。
+  // 読めなかったとき（オフライン・ファイルで直接開いたときなど）は、前回読めた分を使う
+  let vShared = [];
+  const vNorm = arr => (Array.isArray(arr) ? arr : []).filter(x => x && x.url).map((x, i) => ({ id: 's' + i, name: x.name || '動画', src: x.url, thumb: x.thumb || '', dur: +x.dur || 0, shared: true }));
+  try { vShared = vNorm(JSON.parse(localStorage.getItem('nclock.asmrShared') || '[]')); } catch {}
+  async function vLoadShared() {
+    try {
+      const r = await fetch('asmr-videos.json', { cache: 'no-cache' }); if (!r.ok) throw 0;
+      const j = await r.json(), list = j.videos || j;
+      vShared = vNorm(list);
+      try { localStorage.setItem('nclock.asmrShared', JSON.stringify(list)); } catch {}
+    } catch {}
+  }
   const vFmt = sec => { sec = Math.max(0, Math.floor(sec || 0)); const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s2 = sec % 60; return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(s2).padStart(2, '0'); };
   // サムネイルと長さを作る（動画の1割あたりの場面）
   function vProbe(src) {
@@ -3355,14 +3368,15 @@
     });
   }
   async function vRender() {
+    await vLoadShared();
     vList = (await vAll()).sort((a, b) => b.added - a.added);
     const urls = settings.asmrUrls.map(u => ({ ...u, url: true }));
-    const all = [...vList, ...urls];
+    const all = [...vShared, ...vList, ...urls];
     $('#vGrid').innerHTML = all.length ? all.map(v => `
       <div class="vCard" data-id="${esc2(v.id)}">
-        <div class="vThumb" style="background-image:url('${v.thumb || ''}')"><span class="vDur">${vFmt(v.dur)}</span></div>
-        <b title="${esc2(v.name)}">${esc2(v.name)}</b><small>${v.url ? 'URL' : ((v.size || 0) / 1048576).toFixed(0) + ' MB'}</small>
-        <button class="jbDel" title="削除">✕</button>
+        <div class="vThumb" style="background-image:url('${v.thumb || ''}')">${v.dur ? `<span class="vDur">${vFmt(v.dur)}</span>` : ''}</div>
+        <b title="${esc2(v.name)}">${esc2(v.name)}</b><small>${v.shared ? '共通' : v.url ? 'URL' : ((v.size || 0) / 1048576).toFixed(0) + ' MB'}</small>
+        ${v.shared ? '' : '<button class="jbDel" title="削除">✕</button>'}
       </div>`).join('') : '<div class="jbEmpty">まだ動画がありません。下の「＋ 動画ファイルを追加」から選んでください（mp4 など）。</div>';
   }
   $('#asmrBtn').addEventListener('click', () => { $('#asmr').classList.add('open'); vRender(); });
@@ -3394,7 +3408,7 @@
       else await vtx('readwrite', st => st.delete(id));
       vRender(); return;
     }
-    const v = vList.find(x => x.id === id) || settings.asmrUrls.find(x => x.id === id); if (!v) return;
+    const v = vShared.find(x => x.id === id) || vList.find(x => x.id === id) || settings.asmrUrls.find(x => x.id === id); if (!v) return;
     vPlay(v); $('#asmr').classList.remove('open');
   });
   const vEl = $('#vEl'), vP = $('#vPlayer');
