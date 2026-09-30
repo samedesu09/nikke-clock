@@ -791,10 +791,11 @@
   #vPlayer.mini .vCtl { padding: 6px 10px 10px; }
   /* 壁紙：背景で全面に再生（キャラや時計は手前のまま）。操作は下の小さなバー */
   /* removed: display: contents breaks position:fixed */
-  #vPlayer.show.bg { position: fixed; inset: 0; pointer-events: none; z-index: -2; }
-  #vPlayer.bg video { position: fixed; inset: 0; width: 100vw; height: 100vh; max-height: none; object-fit: cover; z-index: 0; pointer-events: none; background: #000; filter: brightness(var(--vb)); }
+  /* 壁紙：プレイヤー自体は“枠なし”にして（transform・clip-path・z-index があると fixed の基準や重なりが狂う）、動画だけを最背面に敷く */
+  #vPlayer.show.bg { position: static; z-index: auto; transform: none; clip-path: none; width: auto; left: auto; top: auto; border: 0; background: none; box-shadow: none; pointer-events: none; }
+  #vPlayer.bg video { position: fixed; inset: 0; width: 100vw; height: 100vh; max-height: none; object-fit: cover; z-index: -1; pointer-events: none; background: #000; filter: brightness(var(--vb)); }
   #vPlayer.bg .vTop { display: none; pointer-events: none; }
-  #vPlayer.bg .vCtl { position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(560px, 94vw); z-index: 95;
+  #vPlayer.bg .vCtl { position: fixed; pointer-events: auto; left: max(16px, env(safe-area-inset-left)); bottom: max(20px, env(safe-area-inset-bottom)); width: min(520px, calc(100vw - 32px)); z-index: 95;
     background: rgba(4,8,16,.74); border: 1px solid rgba(255,143,208,.45); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px)); transition: opacity .5s; }
   #vPlayer.bg:not(.act) .vCtl { opacity: .28; }
@@ -802,9 +803,10 @@
   #vPlayer.bg .vXBtn { display: inline-block; }
   #vPlayer.bg .vBrightBox { display: inline-flex; }
   #vPlayer.bg .vVolBox { margin-left: 0; order: 5; width: 100%; justify-content: center; }
-  #vPlayer.bg .vEq { position: fixed !important; visibility: visible !important; left: 50%; bottom: calc(max(20px, env(safe-area-inset-bottom)) + 118px); transform: translateX(-50%); width: min(560px, 94vw); z-index: 95;
+  #vPlayer.bg .vEq { position: fixed; pointer-events: auto; left: max(16px, env(safe-area-inset-left)); bottom: calc(max(20px, env(safe-area-inset-bottom)) + 118px); width: min(520px, calc(100vw - 32px)); z-index: 95;
     background: rgba(4,8,16,.86); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
   #vPlayer.bg.eq .vEq { border: 1px solid rgba(255,143,208,.4); }
+  @media (max-width: 1000px) { #vPlayer.bg .vCtl { bottom: calc(max(20px, env(safe-area-inset-bottom)) + 84px); } #vPlayer.bg .vEq { bottom: calc(max(20px, env(safe-area-inset-bottom)) + 202px); } }
 </style>
 </head>
 <body class="idle">
@@ -3441,23 +3443,6 @@
   $('#asmrBtn').addEventListener('click', () => { $('#asmr').classList.add('open'); vRender(); });
   $('#asmrClose').addEventListener('click', () => $('#asmr').classList.remove('open'));
   $('#asmr').addEventListener('click', e => { if (e.target.id === 'asmr') $('#asmr').classList.remove('open'); });
-  $('#vAddFile').addEventListener('click', () => $('#vFile').click());
-  $('#vFile').addEventListener('change', async e => {
-    const files = [...e.target.files]; e.target.value = '';
-    for (const f of files) {
-      $('#vGrid').insertAdjacentHTML('afterbegin', `<div class="jbEmpty">「${esc2(f.name)}」を取り込み中…</div>`);
-      const u = URL.createObjectURL(f), info = await vProbe(u); URL.revokeObjectURL(u);
-      try { await vtx('readwrite', st => st.put({ id: 'v' + Date.now() + Math.random().toString(36).slice(2, 6), name: f.name.replace(/\.[^.]+$/, ''), blob: f, size: f.size, type: f.type, thumb: info.thumb, dur: info.dur, added: Date.now() })); }
-      catch { alert('保存できませんでした（端末の空き容量やブラウザの制限の可能性があります）'); }
-    }
-    vRender();
-  });
-  $('#vAddUrl').addEventListener('click', async () => {
-    const url = $('#vUrl').value.trim(); if (!/^https?:\/\/|^[\w./-]+\.(mp4|m4v|mov|webm)$/i.test(url)) { alert('動画ファイルのURLを貼ってください'); return; }
-    const info = await vProbe(url);
-    settings.asmrUrls.unshift({ id: 'u' + Date.now(), name: decodeURIComponent(url.split('/').pop().replace(/\.[^.]+$/, '')) || '動画', src: url, thumb: info.thumb, dur: info.dur, added: Date.now() });
-    save(); $('#vUrl').value = ''; vRender();
-  });
   $('#vGrid').addEventListener('click', async e => {
     const card = e.target.closest('.vCard'); if (!card) return;
     const id = card.dataset.id;
