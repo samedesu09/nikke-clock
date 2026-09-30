@@ -791,10 +791,10 @@
   #vPlayer.mini .vCtl { padding: 6px 10px 10px; }
   /* 壁紙：背景で全面に再生（キャラや時計は手前のまま）。操作は下の小さなバー */
   /* removed: display: contents breaks position:fixed */
-  #vPlayer.show.bg { visibility: hidden; pointer-events: none; }
-  #vPlayer.bg video { position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100vh !important; max-height: none !important; object-fit: cover; z-index: 0 !important; pointer-events: none; background: #000; filter: brightness(var(--vb)); visibility: visible !important; }
-  #vPlayer.bg .vTop { display: none; }
-  #vPlayer.bg .vCtl { position: fixed !important; visibility: visible !important; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(560px, 94vw); z-index: 95;
+  #vPlayer.show.bg { position: fixed; inset: 0; pointer-events: none; z-index: -2; }
+  #vPlayer.bg video { position: fixed; inset: 0; width: 100vw; height: 100vh; max-height: none; object-fit: cover; z-index: 0; pointer-events: none; background: #000; filter: brightness(var(--vb)); }
+  #vPlayer.bg .vTop { display: none; pointer-events: none; }
+  #vPlayer.bg .vCtl { position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(560px, 94vw); z-index: 95;
     background: rgba(4,8,16,.74); border: 1px solid rgba(255,143,208,.45); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px)); transition: opacity .5s; }
   #vPlayer.bg:not(.act) .vCtl { opacity: .28; }
@@ -1080,11 +1080,7 @@
     </div>
     <div id="vGrid"></div>
     <div class="jbFoot">
-      <button id="vAddFile">＋ 動画ファイルを追加</button>
-      <input type="file" id="vFile" accept="video/*,.mp4,.mov,.m4v,.webm" multiple style="display:none">
-      <input id="vUrl" type="text" placeholder="動画のURL（GitHubに置いた mp4 など）を貼って追加">
-      <button id="vAddUrl">URLで追加</button>
-      <div class="note" id="vNote"><b>ASMR</b><span>動画をタップで再生。「共通」は誰が開いても出る動画、自分で追加したものはこの端末だけに出ます</span></div>
+      <div class="note" id="vNote"><b>ASMR</b><span>ヘッドホンをつけてお楽しみください🎧</span></div>
     </div>
   </div>
 </div>
