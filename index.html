@@ -752,10 +752,10 @@
   .vCtl { padding: 8px 14px 12px; }
   .vRow { display: flex; align-items: center; gap: 8px; }
   .vBtns { margin-top: 8px; flex-wrap: wrap; justify-content: center; row-gap: 8px; }
-  .vCtl button, .vTop button, .vEq button { height: 32px; min-width: 32px; padding: 0 10px; border: 1px solid rgba(255,143,208,.45); background: rgba(255,143,208,.08); color: #fff; cursor: pointer; font: 500 12px "Oxanium", "Hiragino Sans", sans-serif;
+  .vCtl button, .vTop button { height: 32px; min-width: 32px; padding: 0 10px; border: 1px solid rgba(255,143,208,.45); background: rgba(255,143,208,.08); color: #fff; cursor: pointer; font: 500 12px "Oxanium", "Hiragino Sans", sans-serif;
     clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px); transition: background .15s; }
-  .vCtl button:active, .vTop button:active, .vEq button:active { background: rgba(255,143,208,.4); }
-  .vCtl button.on, .vEq button.on, .vTop button.on { background: rgba(255,143,208,.34); border-color: #ff8fd0; }
+  .vCtl button:active, .vTop button:active { background: rgba(255,143,208,.4); }
+  .vCtl button.on, .vTop button.on { background: rgba(255,143,208,.34); border-color: #ff8fd0; }
   .vCtl .vSkip { min-width: 46px; font-weight: 600; letter-spacing: .02em; color: #bfefff; border-color: rgba(95,224,255,.45); background: rgba(95,224,255,.08); }
   .vCtl .vPlayBtn { width: 52px; height: 38px; font-size: 15px; background: rgba(255,143,208,.28); }
   .vBar { flex: 1; position: relative; height: 18px; cursor: pointer; touch-action: none; }
@@ -767,46 +767,45 @@
   .vSlide input { width: 84px; accent-color: #ff8fd0; }
   .vVolBox { margin-left: auto; display: flex; gap: 12px; align-items: center; }
   .vBackBtn, .vXBtn, .vBrightBox { display: none; }
-  /* イコライザ（展開式） */
-  .vEq { max-height: 0; overflow: hidden; transition: max-height .35s ease; border-top: 0 solid rgba(255,143,208,.25); }
-  #vPlayer.eq .vEq { max-height: 380px; border-top-width: 1px; }
-  #vPlayer.eq:not(.bg):not(.mini) video { max-height: min(40vh, 360px); }
-  .vEqIn { padding: 10px 14px 14px; }
-  #vSpec { display: block; width: 100%; height: 44px; margin-bottom: 8px; }
-  .vPre { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
-  .vPre button { height: 26px; font-size: 11px; padding: 0 9px; }
-  .eqRow { display: grid; grid-template-columns: 52px 1fr 34px; align-items: center; gap: 8px; font: 500 11px "Oxanium", sans-serif; color: rgba(223,255,255,.8); height: 26px; }
-  .eqRow input { width: 100%; accent-color: #5fe0ff; }
-  .eqRow b { text-align: right; font-weight: 600; color: #5fe0ff; }
-  .vEqNote { display: none; font-size: 11px; line-height: 1.5; color: #ffb3d1; padding-top: 6px; }
-  #vPlayer.eqNo .vEqNote { display: block; }
-  #vPlayer.eqNo .eqRow, #vPlayer.eqNo .vPre, #vPlayer.eqNo #vSpec { opacity: .3; pointer-events: none; }
   /* 小窓：ドラッグで移動できる */
   #vPlayer.mini { width: min(380px, 62vw); transform: none; left: auto; top: auto; }
   #vPlayer.mini .vTop { cursor: grab; }
   #vPlayer.mini.drag .vTop { cursor: grabbing; }
   #vPlayer.mini video { max-height: 30vh; }
   #vPlayer.mini .vTop::before { content: "⠿"; color: rgba(255,143,208,.8); font-size: 14px; margin-right: 2px; }
-  #vPlayer.mini .vEqBtn, #vPlayer.mini .vVolBox, #vPlayer.mini .vSkip[data-skip="10"], #vPlayer.mini .vSkip[data-skip="-10"], #vPlayer.mini .vTop [data-v="full"], #vPlayer.mini .vEq { display: none; }
+  #vPlayer.mini .vVolBox, #vPlayer.mini .vSkip[data-skip="10"], #vPlayer.mini .vSkip[data-skip="-10"], #vPlayer.mini .vTop [data-v="full"] { display: none; }
   #vPlayer.mini .vCtl { padding: 6px 10px 10px; }
   /* 壁紙：背景で全面に再生（キャラや時計は手前のまま）。操作は下の小さなバー */
   /* removed: display: contents breaks position:fixed */
   /* 壁紙：プレイヤー自体は“枠なし”にして（transform・clip-path・z-index があると fixed の基準や重なりが狂う）、動画だけを最背面に敷く */
+  body.vbg { background: none !important; }
   #vPlayer.show.bg { position: static; z-index: auto; transform: none; clip-path: none; width: auto; left: auto; top: auto; border: 0; background: none; box-shadow: none; pointer-events: none; }
   #vPlayer.bg video { position: fixed; inset: 0; width: 100vw; height: 100vh; max-height: none; object-fit: cover; z-index: -1; pointer-events: none; background: #000; filter: brightness(var(--vb)); }
   #vPlayer.bg .vTop { display: none; pointer-events: none; }
-  #vPlayer.bg .vCtl { position: fixed; pointer-events: auto; left: max(16px, env(safe-area-inset-left)); bottom: max(20px, env(safe-area-inset-bottom)); width: min(520px, calc(100vw - 32px)); z-index: 95;
+  #vPlayer.bg .vCtl, #vPlayer.d3 .vCtl { position: fixed; pointer-events: auto; left: max(16px, env(safe-area-inset-left)); bottom: max(20px, env(safe-area-inset-bottom)); width: min(520px, calc(100vw - 32px)); z-index: 95;
     background: rgba(4,8,16,.74); border: 1px solid rgba(255,143,208,.45); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px)); transition: opacity .5s; }
+  /* 3Dパネル：斜めに浮かぶ動画パネル＋床への映り込み。背景ドラッグで角度、背景クリックで戻る */
+  .vReflBox, .vHint { display: none; }
+  #vPlayer.show.d3 { left: 0; top: 0; width: 100vw; height: 100vh; transform: none; clip-path: none; border: 0; box-shadow: none;
+    background: rgba(2,6,12,.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); perspective: 1500px;
+    display: flex; align-items: center; justify-content: center; touch-action: none; cursor: grab; }
+  #vPlayer.d3.grab { cursor: grabbing; }
+  #vPlayer.d3 .vTop { display: none; }
+  #vPlayer.d3 video { width: min(64vw, calc((100vh - 240px) * 16 / 9)); max-height: none; aspect-ratio: 16 / 9; object-fit: contain; margin-top: -70px; cursor: pointer;
+    transform: rotateY(var(--ry, -14deg)) rotateX(var(--rx, 6deg)); will-change: transform; border: 1px solid rgba(95,224,255,.55); border-radius: 4px;
+    box-shadow: 0 40px 90px rgba(0,0,0,.65), 0 0 46px rgba(255,120,200,.28), 0 0 0 1px rgba(255,143,208,.25);
+    -webkit-box-reflect: below 10px linear-gradient(to bottom, transparent 56%, rgba(255,255,255,calc(var(--refl, .7) * .5))); }
+  #vPlayer.d3 .vReflBox { display: inline-flex; }
+  #vPlayer.d3 .vBrightBox { display: none; }
+  #vPlayer.d3 .vHint { display: block; position: fixed; top: max(22px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 95; pointer-events: none;
+    font: 600 11px "Oxanium", "Hiragino Sans", sans-serif; letter-spacing: .14em; color: rgba(223,255,255,.7); text-shadow: 0 0 10px rgba(95,224,255,.5); white-space: nowrap; }
   #vPlayer.bg:not(.act) .vCtl { opacity: .28; }
-  #vPlayer.bg .vBackBtn { display: inline-block; background: rgba(255,143,208,.3); font-weight: 600; }
-  #vPlayer.bg .vXBtn { display: inline-block; }
+  #vPlayer.bg .vBackBtn, #vPlayer.d3 .vBackBtn { display: inline-block; background: rgba(255,143,208,.3); font-weight: 600; }
+  #vPlayer.bg .vXBtn, #vPlayer.d3 .vXBtn { display: inline-block; }
   #vPlayer.bg .vBrightBox { display: inline-flex; }
-  #vPlayer.bg .vVolBox { margin-left: 0; order: 5; width: 100%; justify-content: center; }
-  #vPlayer.bg .vEq { position: fixed; pointer-events: auto; left: max(16px, env(safe-area-inset-left)); bottom: calc(max(20px, env(safe-area-inset-bottom)) + 118px); width: min(520px, calc(100vw - 32px)); z-index: 95;
-    background: rgba(4,8,16,.86); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-  #vPlayer.bg.eq .vEq { border: 1px solid rgba(255,143,208,.4); }
-  @media (max-width: 1000px) { #vPlayer.bg .vCtl { bottom: calc(max(20px, env(safe-area-inset-bottom)) + 84px); } #vPlayer.bg .vEq { bottom: calc(max(20px, env(safe-area-inset-bottom)) + 202px); } }
+  #vPlayer.bg .vVolBox, #vPlayer.d3 .vVolBox { margin-left: 0; order: 5; width: 100%; justify-content: center; }
+  @media (max-width: 1000px) { #vPlayer.bg .vCtl, #vPlayer.d3 .vCtl { bottom: calc(max(20px, env(safe-area-inset-bottom)) + 84px); } }
 </style>
 </head>
 <body class="idle">
@@ -1089,10 +1088,12 @@
 <div id="vPlayer">
   <div class="vTop"><small>NOW PLAYING</small><b id="vTitle"></b>
     <button data-v="mini" title="小窓にする／大きく戻す">小窓</button>
+    <button data-v="d3" title="3Dパネルで表示">3D</button>
     <button data-v="bg" title="壁紙として背景で再生">壁紙</button>
     <button data-v="full" title="全画面">⛶</button>
     <button data-v="close" title="閉じる">✕</button></div>
   <video id="vEl" playsinline preload="metadata"></video>
+  <div class="vHint">背景ドラッグで角度・クリックで戻る</div>
   <div class="vCtl">
     <div class="vRow"><span class="vTime" id="vCurT">0:00</span><div class="vBar" id="vBar"><i></i><b></b></div><span class="vTime" id="vDurT">0:00</span></div>
     <div class="vRow vBtns">
@@ -1101,20 +1102,14 @@
       <button class="vSkip" data-skip="-10">−10s</button><button class="vSkip" data-skip="-5">−5s</button>
       <button data-v="play" class="vPlayBtn" title="再生／一時停止">▶</button>
       <button class="vSkip" data-skip="5">+5s</button><button class="vSkip" data-skip="10">+10s</button>
-      <button data-v="eq" class="vEqBtn" title="イコライザ">EQ ▾</button>
       <span class="vVolBox">
         <label class="vSlide">VOL<input type="range" id="vVol" min="0" max="100" step="1"></label>
+        <label class="vSlide vReflBox">REFLECT<input type="range" id="vRefl" min="0" max="100" step="1"></label>
         <label class="vSlide vBrightBox">BRT<input type="range" id="vBright" min="20" max="100" step="1"></label>
       </span>
       <button data-v="close" class="vXBtn" title="閉じる">✕</button>
     </div>
   </div>
-  <div class="vEq" id="vEq"><div class="vEqIn">
-    <canvas id="vSpec"></canvas>
-    <div class="vPre" id="vPre"></div>
-    <div id="vEqRows"></div>
-    <div class="vEqNote">この動画は配信元（GitHub Releases など）の制限で、音質の調整に対応していません。端末に追加した動画ファイル、またはこのサイト内に置いた動画なら使えます。</div>
-  </div></div>
 </div>
 
 <script>
@@ -3457,60 +3452,20 @@
   });
   // ================= 動画プレイヤー =================
   const vP = $('#vPlayer');
-  let vEl = $('#vEl'), vMode = 'win', vPrev = 'win', vCors = false, specRaf = 0;
-  const EQF = [[60, 'lowshelf', '60'], [230, 'peaking', '230'], [910, 'peaking', '910'], [3600, 'peaking', '3.6k'], [14000, 'highshelf', '14k']];
-  const EQPRE = { 'フラット': [0, 0, 0, 0, 0], '低音': [6, 4, 0, -1, -2], '声くっきり': [-3, -1, 2, 4, 2], 'ささやき': [-4, -2, 2, 5, 3], '高音': [-2, -1, 0, 3, 6] };
-  if (!Array.isArray(settings.asmrEq) || settings.asmrEq.length !== 5) settings.asmrEq = [0, 0, 0, 0, 0];
+  let vEl = $('#vEl'), vMode = 'win', vPrev = 'win';
   if (settings.asmrBright == null) settings.asmrBright = 80;
-  const eqNonFlat = () => settings.asmrEq.some(x => x);
-  const sameOrigin = u => { try { return new URL(u, location.href).origin === location.origin; } catch { return false; } };
+  if (!settings.asmr3d || typeof settings.asmr3d.ry !== 'number') settings.asmr3d = { ry: -14, rx: 6, refl: 70 };
   vP.style.setProperty('--vb', settings.asmrBright / 100);
   $('#vVol').value = settings.asmrVol; $('#vBright').value = settings.asmrBright;
+  const v3Apply = () => { const t = settings.asmr3d; vP.style.setProperty('--ry', t.ry + 'deg'); vP.style.setProperty('--rx', t.rx + 'deg'); vP.style.setProperty('--refl', t.refl / 100); };
+  v3Apply(); $('#vRefl').value = settings.asmr3d.refl;
 
-  // --- 音のつなぎ（イコライザ）：必要になったときだけ Web Audio にくぐらせる ---
-  let vg = null;
-  function vgInit() {
-    if (vg) return vg;
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const filters = EQF.map(([f, t], i) => { const b = ctx.createBiquadFilter(); b.type = t; b.frequency.value = f; if (t === 'peaking') b.Q.value = 1; b.gain.value = settings.asmrEq[i]; return b; });
-    const an = ctx.createAnalyser(); an.fftSize = 128; an.smoothingTimeConstant = 0.8;
-    const gain = ctx.createGain(); gain.gain.value = settings.asmrVol / 100;
-    filters.reduce((a, b) => (a.connect(b), b)); filters[4].connect(an); an.connect(gain); gain.connect(ctx.destination);
-    return vg = { ctx, filters, an, gain, el: null, bins: new Uint8Array(an.frequencyBinCount) };
-  }
-  function vgAttach(el) {
-    try {
-      const g = vgInit(); if (g.el === el) return true;
-      g.ctx.createMediaElementSource(el).connect(g.filters[0]); g.el = el; el.volume = 1; g.ctx.resume && g.ctx.resume();
-      vSetVol(); return true;
-    } catch { return false; }
-  }
-  function vSetVol() {
-    const v = settings.asmrVol / 100;
-    if (vg && vg.el === vEl) vg.gain.gain.value = v; else { try { vEl.volume = v; } catch {} }
-  }
-  const vEqNo = f => vP.classList.toggle('eqNo', !!f);
-  async function vEnableEq() {
-    const v = vCur; if (!v) return false;
-    if (vg && vg.el === vEl) return true;
-    if (v.blob || sameOrigin(v.src) || vCors) return vgAttach(vEl);
-    // 他のサイトの動画：向こうが CORS を許可しているときだけ、読み直して対応させる
-    try { const r = await fetch(v.src, { method: 'HEAD', mode: 'cors' }); if (!r.ok) throw 0; } catch { return false; }
-    if (vCur !== v) return false;
-    const t = vEl.currentTime, play = !vEl.paused;
-    vLoad(v, { cors: true, t, play, forceEq: true });
-    return true;
-  }
-
+  const vSetVol = () => { try { vEl.volume = settings.asmrVol / 100; } catch {} };
   // --- 読み込み（動画ごとに <video> を作り直す：音のつなぎを毎回まっさらにするため） ---
   function vBind(el) {
     const on = (ev, fn) => el.addEventListener(ev, () => { if (el === vEl) fn(); });
     ['timeupdate', 'play', 'pause', 'loadedmetadata', 'durationchange'].forEach(ev => on(ev, vUpd));
     on('loadedmetadata', () => { if (vMode === 'mini') vApplyPos(); });
-    on('play', () => { if (vg && vg.el === el) vg.ctx.resume && vg.ctx.resume(); });
-    on('error', () => {           // CORS つきで読めなかった → ふつうの読み込みに戻す（イコライザは非対応）
-      if (vCors && vCur && !vCur.blob) { const t = el.currentTime; vEqNo(true); vLoad(vCur, { t, play: true }); }
-    });
     el.addEventListener('click', () => { if (el === vEl && vMode !== 'bg') el.paused ? el.play() : el.pause(); });
     // 取り込み時にサムネイル・長さが取れなかった動画は、再生したときに補って保存する
     on('timeupdate', async () => {
@@ -3529,25 +3484,21 @@
   function vLoad(v, o = {}) {
     const old = vEl, el = document.createElement('video');
     el.id = 'vEl'; el.playsInline = true; el.setAttribute('playsinline', ''); el.preload = 'metadata'; el.loop = !!settings.asmrLoop;
-    if (o.cors) el.crossOrigin = 'anonymous';
     old.replaceWith(el);
     try { old.pause(); old.removeAttribute('src'); old.load(); } catch {}
-    vEl = el; vCur = v; vCors = !!o.cors; vBind(el);
+    vEl = el; vCur = v; vBind(el);
     if (o.t) el.addEventListener('loadedmetadata', () => { try { el.currentTime = o.t; } catch {} }, { once: true });
     el.src = v.blob ? vUrlObj : v.src;
-    if (v.blob || sameOrigin(v.src) || o.cors) { if (vg || eqNonFlat() || o.forceEq) vgAttach(el); }
     vSetVol();
     if (o.play !== false) el.play().catch(() => {});
     vUpd();
-    if (o.cors) vEqNo(false);
-    else if (vP.classList.contains('eq')) vEnableEq().then(ok => vEqNo(!ok));
   }
   function vPlay(v) {
     if (vUrlObj) { URL.revokeObjectURL(vUrlObj); vUrlObj = null; }
     if (v.blob) vUrlObj = URL.createObjectURL(v.blob);
     $('#vTitle').textContent = v.name;
     if (!vP.classList.contains('show')) vSetMode('win');
-    vP.classList.add('show'); vEqNo(false);
+    vP.classList.add('show');
     try { audio.pause(); } catch {}          // ジュークボックスの試聴は止める
     vLoad(v, {});
   }
@@ -3573,12 +3524,34 @@
     vP.style.left = x + 'px'; vP.style.top = y + 'px';
   }
   function vSetMode(m) {
-    if (m === 'bg' && vMode !== 'bg') vPrev = vMode === 'mini' ? 'mini' : 'win';
-    vMode = m; vP.classList.toggle('mini', m === 'mini'); vP.classList.toggle('bg', m === 'bg');
+    if ((m === 'bg' || m === 'd3') && vMode !== 'bg' && vMode !== 'd3') vPrev = vMode === 'mini' ? 'mini' : 'win';
+    vMode = m; vP.classList.toggle('mini', m === 'mini'); vP.classList.toggle('bg', m === 'bg'); vP.classList.toggle('d3', m === 'd3'); document.body.classList.toggle('vbg', m === 'bg');
     vP.querySelector('[data-v=mini]').classList.toggle('on', m === 'mini');
     if (m === 'mini') vApplyPos(); else { vP.style.left = ''; vP.style.top = ''; }
     if (m === 'bg') vAct();
   }
+  // 3Dパネル：背景をドラッグして角度を変える／ちょんと押したら戻る
+  let v3 = null, v3Drag = false;
+  vP.addEventListener('pointerdown', e => {
+    if (vMode !== 'd3' || e.target.closest('.vCtl')) return;
+    v3 = { x: e.clientX, y: e.clientY, ry: settings.asmr3d.ry, rx: settings.asmr3d.rx, t: e.target, moved: false }; v3Drag = false;
+    vP.setPointerCapture(e.pointerId); vP.classList.add('grab');
+  });
+  vP.addEventListener('pointermove', e => {
+    if (!v3) return;
+    const dx = e.clientX - v3.x, dy = e.clientY - v3.y;
+    if (!v3.moved && Math.hypot(dx, dy) < 6) return;
+    v3.moved = v3Drag = true;
+    settings.asmr3d.ry = Math.max(-45, Math.min(45, v3.ry + dx * 0.12)); settings.asmr3d.rx = Math.max(-30, Math.min(30, v3.rx - dy * 0.12)); v3Apply();
+  });
+  const v3End = e => {
+    if (!v3) return; const d = v3; v3 = null; vP.classList.remove('grab');
+    try { vP.releasePointerCapture(e.pointerId); } catch {}
+    if (d.moved) save(); else if (d.t === vP) vSetMode(vPrev);       // 背景をクリック → 戻る
+  };
+  vP.addEventListener('pointerup', v3End); vP.addEventListener('pointercancel', v3End);
+  vP.addEventListener('click', e => { if (v3Drag) { v3Drag = false; e.stopPropagation(); e.preventDefault(); } }, true);   // ドラッグ後の click は再生／停止にしない
+  $('#vRefl').addEventListener('input', e => { settings.asmr3d.refl = +e.target.value; v3Apply(); clearTimeout(e.target.t); e.target.t = setTimeout(save, 400); });
   addEventListener('resize', () => { if (vMode === 'mini') vApplyPos(); });
   vP.querySelector('.vTop').addEventListener('pointerdown', e => {
     if (vMode !== 'mini' || e.target.closest('button')) return;
@@ -3597,40 +3570,12 @@
   function vAct() { vP.classList.add('act'); clearTimeout(actT); actT = setTimeout(() => vP.classList.remove('act'), 3500); }
   ['pointerdown', 'pointermove', 'keydown'].forEach(ev => addEventListener(ev, () => { if (vMode === 'bg' && vP.classList.contains('show')) vAct(); }, { passive: true }));
 
-  // --- イコライザ ---
-  $('#vPre').innerHTML = Object.keys(EQPRE).map(k => `<button data-pre="${k}">${k}</button>`).join('');
-  $('#vEqRows').innerHTML = EQF.map(([, , l], i) => `<label class="eqRow"><span>${l}Hz</span><input type="range" min="-12" max="12" step="1" data-i="${i}"><b>0</b></label>`).join('');
-  function renderEq() {
-    $('#vEqRows').querySelectorAll('input').forEach(r => { const v = settings.asmrEq[+r.dataset.i]; r.value = v; r.nextElementSibling.textContent = (v > 0 ? '+' : '') + v; });
-    $('#vPre').querySelectorAll('button').forEach(b => b.classList.toggle('on', EQPRE[b.dataset.pre].every((x, i) => x === settings.asmrEq[i])));
-  }
-  const eqApply = () => { if (vg) vg.filters.forEach((f, i) => { f.gain.value = settings.asmrEq[i]; }); renderEq(); clearTimeout(eqApply.t); eqApply.t = setTimeout(save, 400); };
-  $('#vEqRows').addEventListener('input', e => { const r = e.target.closest('input'); if (!r) return; settings.asmrEq[+r.dataset.i] = +r.value; eqApply(); });
-  $('#vPre').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; settings.asmrEq = EQPRE[b.dataset.pre].slice(); eqApply(); });
-  renderEq();
-  function vSpecLoop() {
-    cancelAnimationFrame(specRaf);
-    const c = $('#vSpec'), x = c.getContext('2d');
-    const draw = () => {
-      if (!vP.classList.contains('eq') || !vP.classList.contains('show')) return;
-      specRaf = requestAnimationFrame(draw);
-      const W = c.clientWidth, H = c.clientHeight; if (!W) return;
-      if (c.width !== W) c.width = W; if (c.height !== H) c.height = H;
-      x.clearRect(0, 0, W, H);
-      if (!vg || vg.el !== vEl || vEl.paused) { x.fillStyle = 'rgba(255,143,208,.25)'; x.fillRect(0, H - 2, W, 2); return; }
-      vg.an.getByteFrequencyData(vg.bins);
-      const n = 32, bw = W / n;
-      for (let i = 0; i < n; i++) { const v = vg.bins[Math.floor(i * vg.bins.length * 0.75 / n)] / 255, h = Math.max(2, v * H); x.fillStyle = `rgba(${255 - i * 5},${143 + i * 3},208,.85)`; x.fillRect(i * bw + 1, H - h, bw - 2, h); }
-    };
-    draw();
-  }
-
   // --- ボタン・キーボード ---
   function vClose() {
     vEl.pause(); vEl.removeAttribute('src'); vEl.load();
-    vP.classList.remove('show', 'mini', 'bg', 'eq', 'eqNo', 'act', 'drag'); vMode = 'win'; vP.style.left = ''; vP.style.top = '';
+    vP.classList.remove('show', 'mini', 'bg', 'd3', 'grab', 'act', 'drag'); vMode = 'win'; vP.style.left = ''; vP.style.top = '';
     if (vUrlObj) { URL.revokeObjectURL(vUrlObj); vUrlObj = null; }
-    vCur = null; cancelAnimationFrame(specRaf);
+    vCur = null; document.body.classList.remove('vbg');
   }
   vP.addEventListener('click', async e => {
     const sk = e.target.closest('[data-skip]'); if (sk) { vSkip(+sk.dataset.skip); return; }
@@ -3640,12 +3585,9 @@
     else if (k === 'loop') { vEl.loop = !vEl.loop; settings.asmrLoop = vEl.loop; save(); b.classList.toggle('on', vEl.loop); }
     else if (k === 'mini') vSetMode(vMode === 'mini' ? 'win' : 'mini');
     else if (k === 'bg') vSetMode('bg');
+    else if (k === 'd3') vSetMode('d3');
     else if (k === 'back') vSetMode(vPrev);
     else if (k === 'full') { (vEl.requestFullscreen || vEl.webkitEnterFullscreen || vEl.webkitRequestFullscreen)?.call(vEl); }
-    else if (k === 'eq') {
-      const open = vP.classList.toggle('eq'); b.textContent = open ? 'EQ ▴' : 'EQ ▾';
-      if (open) { vSpecLoop(); vEqNo(!(await vEnableEq())); }
-    }
     else if (k === 'close') vClose();
   });
   vP.querySelector('[data-v=loop]').classList.toggle('on', !!settings.asmrLoop);
@@ -3655,7 +3597,7 @@
     if (e.key === 'ArrowLeft') { vSkip(e.shiftKey ? -10 : -5); e.preventDefault(); }
     else if (e.key === 'ArrowRight') { vSkip(e.shiftKey ? 10 : 5); e.preventDefault(); }
     else if (e.key === ' ' && e.target.tagName !== 'BUTTON') { vEl.paused ? vEl.play() : vEl.pause(); e.preventDefault(); }
-    else if (e.key === 'Escape' && vMode === 'bg') vSetMode(vPrev);
+    else if (e.key === 'Escape' && (vMode === 'bg' || vMode === 'd3')) vSetMode(vPrev);
   });
   // 保存容量をできるだけ消されにくくする（対応ブラウザのみ）
   try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch {}
