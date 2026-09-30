@@ -778,7 +778,7 @@
   /* 壁紙：背景で全面に再生（キャラや時計は手前のまま）。操作は下の小さなバー */
   /* removed: display: contents breaks position:fixed */
   /* 壁紙：プレイヤー自体は“枠なし”にして（transform・clip-path・z-index があると fixed の基準や重なりが狂う）、動画だけを最背面に敷く */
-  body.vbg { background: none !important; }
+  body.vbg, body.vbehind { background: none !important; }
   body.vbg #stage, body.vbg #shadows, body.vbg #floor, body.vbg #footTags, body.vbg #addSlot { visibility: hidden !important; }   /* 壁紙のあいだはキャラを隠す */
   #vPlayer.show.bg { position: static; z-index: auto; transform: none; clip-path: none; width: auto; left: auto; top: auto; border: 0; background: none; box-shadow: none; pointer-events: none; }
   #vPlayer.bg video { position: fixed; inset: 0; width: 100vw; height: 100vh; max-height: none; object-fit: cover; z-index: -1; pointer-events: none; background: #000; filter: brightness(var(--vb)); }
@@ -787,19 +787,24 @@
     background: rgba(4,8,16,.74); border: 1px solid rgba(255,143,208,.45); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px)); transition: opacity .5s; }
   /* 3Dパネル：斜めに浮かぶ動画パネル＋床への映り込み。背景ドラッグで角度、背景クリックで戻る */
-  .vReflBox, .vSizeBox, .vResetBtn, .vHint { display: none; }
+  .vReflBox, .vSizeBox, .vResetBtn, .vBehindBtn, .vHint, .v3Catch { display: none; }
   #vPlayer.show.d3 { left: 0; top: 0; width: 100vw; height: 100vh; transform: none; clip-path: none; border: 0; box-shadow: none;
     background: none; perspective: 1500px;
     display: flex; align-items: center; justify-content: center; touch-action: none; cursor: grab; }
   #vPlayer.d3.grab { cursor: grabbing; }
   #vPlayer.d3 .vTop { display: none; }
-  #vPlayer.d3 video { width: min(64vw, calc((100vh - 240px) * 16 / 9)); max-height: none; aspect-ratio: 16 / 9; object-fit: contain; margin-top: -70px; cursor: move;
-    transform: translate(var(--tx, 0px), var(--ty, 0px)) scale(var(--sc, 1)) rotateY(var(--ry, -14deg)) rotateX(var(--rx, 6deg)); will-change: transform; border: 1px solid rgba(95,224,255,.55); border-radius: 4px;
+  #vPlayer.d3 video { width: min(64vw, calc((100vh - 240px) * 16 / 9)); max-height: none; aspect-ratio: 16 / 9; object-fit: contain; margin-top: -70px; transform: translate(var(--tx, 0px), var(--ty, 0px)) scale(var(--sc, 1)) rotateY(var(--ry, -14deg)) rotateX(var(--rx, 6deg)); will-change: transform; border: 1px solid rgba(95,224,255,.55); border-radius: 4px;
     box-shadow: 0 40px 90px rgba(0,0,0,.65), 0 0 46px rgba(255,120,200,.28), 0 0 0 1px rgba(255,143,208,.25);
     -webkit-box-reflect: below 10px linear-gradient(to bottom, transparent 56%, rgba(255,255,255,calc(var(--refl, .7) * .5))); }
   #vPlayer.d3 .vReflBox, #vPlayer.d3 .vSizeBox { display: inline-flex; }
   #vPlayer.d3 .vCtl { width: min(620px, calc(100vw - 32px)); }
-  #vPlayer.d3 .vResetBtn { display: inline-block; }
+  #vPlayer.d3 .vResetBtn, #vPlayer.d3 .vBehindBtn { display: inline-block; }
+  #vPlayer.d3 .v3Catch { display: block; position: fixed; inset: 0; z-index: 84; pointer-events: auto; touch-action: none; cursor: grab; }
+  #vPlayer.d3.grab .v3Catch { cursor: grabbing; }
+  /* キャラの後ろ：プレイヤーの枠を外して（重なりの基準になってしまうため）、動画だけをキャラ・時計より後ろに敷く */
+  #vPlayer.show.d3.behind { position: static; z-index: auto; left: auto; top: auto; width: auto; height: auto; perspective: none; display: block; pointer-events: none; }
+  #vPlayer.d3.behind video { position: fixed; left: 50%; top: 50%; z-index: -1; pointer-events: none;
+    transform: perspective(1500px) translate(-50%, -50%) translate(var(--tx, 0px), var(--ty, 0px)) scale(var(--sc, 1)) rotateY(var(--ry, -14deg)) rotateX(var(--rx, 6deg)); }
   #vPlayer.d3 .vBrightBox { display: none; }
   #vPlayer.d3 .vHint { display: block; position: fixed; top: max(22px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 95; pointer-events: none;
     font: 600 11px "Oxanium", "Hiragino Sans", sans-serif; letter-spacing: .14em; color: rgba(223,255,255,.7); text-shadow: 0 0 8px rgba(0,0,0,.9), 0 0 10px rgba(95,224,255,.5); white-space: nowrap; }
@@ -1096,6 +1101,7 @@
     <button data-v="full" title="全画面">⛶</button>
     <button data-v="close" title="閉じる">✕</button></div>
   <video id="vEl" playsinline preload="metadata"></video>
+  <div class="v3Catch"></div>
   <div class="vHint">パネルをドラッグで移動 ／ 背景ドラッグで角度・クリックで戻る ／ ホイールで大きさ</div>
   <div class="vCtl">
     <div class="vRow"><span class="vTime" id="vCurT">0:00</span><div class="vBar" id="vBar"><i></i><b></b></div><span class="vTime" id="vDurT">0:00</span></div>
@@ -1111,6 +1117,7 @@
         <label class="vSlide vReflBox">REFLECT<input type="range" id="vRefl" min="0" max="100" step="1"></label>
         <label class="vSlide vBrightBox">BRT<input type="range" id="vBright" min="20" max="100" step="1"></label>
       </span>
+      <button data-v="d3behind" class="vBehindBtn" title="3Dパネルをキャラ・時計の後ろに置く／前に戻す">キャラの後ろ</button>
       <button data-v="d3reset" class="vResetBtn" title="角度・大きさ・位置を元に戻す">リセット</button>
       <button data-v="close" class="vXBtn" title="閉じる">✕</button>
     </div>
@@ -3459,7 +3466,7 @@
   const vP = $('#vPlayer');
   let vEl = $('#vEl'), vMode = 'win', vPrev = 'win';
   if (settings.asmrBright == null) settings.asmrBright = 80;
-  const D3 = { ry: -14, rx: 6, refl: 70, sc: 100, tx: 0, ty: 0 };
+  const D3 = { ry: -14, rx: 6, refl: 70, sc: 100, tx: 0, ty: 0, behind: 0 };
   if (!settings.asmr3d || typeof settings.asmr3d.ry !== 'number') settings.asmr3d = { ...D3 };
   for (const k in D3) if (typeof settings.asmr3d[k] !== 'number') settings.asmr3d[k] = D3[k];
   vP.style.setProperty('--vb', settings.asmrBright / 100);
@@ -3538,32 +3545,44 @@
     vP.querySelector('[data-v=mini]').classList.toggle('on', m === 'mini');
     if (m === 'mini') vApplyPos(); else { vP.style.left = ''; vP.style.top = ''; }
     if (m === 'bg') vAct();
+    vBehindApply();
+  }
+  // 3Dパネルを「キャラの後ろ」に置く：動画を最背面に敷き、本体の背景グラデーションは html 側に移す（body の背景が動画の手前に塗られてしまうため）
+  function vBehindApply() {
+    const on = vMode === 'd3' && !!settings.asmr3d.behind, de = document.documentElement;
+    if (on && !de.dataset.vbg) { const cs = getComputedStyle(document.body); de.dataset.vbg = '1'; de.style.background = cs.backgroundImage !== 'none' ? cs.backgroundImage : cs.backgroundColor; }
+    if (!on && de.dataset.vbg) { de.style.background = ''; delete de.dataset.vbg; }
+    vP.classList.toggle('behind', on); document.body.classList.toggle('vbehind', on);
+    vP.querySelector('[data-v=d3behind]').classList.toggle('on', !!settings.asmr3d.behind);
   }
   // 3Dパネル：パネルをドラッグ＝移動／背景をドラッグ＝角度／背景をちょんと押す＝戻る／ホイール＝大きさ
   let v3 = null, v3Drag = false;
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const v3Cap = () => vP.querySelector('.v3Catch');
   vP.addEventListener('pointerdown', e => {
     if (vMode !== 'd3' || e.target.closest('.vCtl')) return;
-    const t = settings.asmr3d;
-    v3 = { x: e.clientX, y: e.clientY, ry: t.ry, rx: t.rx, tx: t.tx, ty: t.ty, t: e.target, move: e.target.tagName === 'VIDEO', moved: false }; v3Drag = false;
-    vP.setPointerCapture(e.pointerId); vP.classList.add('grab');
+    const t = settings.asmr3d, r = vEl.getBoundingClientRect();
+    const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;   // パネルの上か、背景か
+    v3 = { x: e.clientX, y: e.clientY, ry: t.ry, rx: t.rx, tx: t.tx, ty: t.ty, inside, moved: false }; v3Drag = false;
+    try { v3Cap().setPointerCapture(e.pointerId); } catch {} vP.classList.add('grab');
   });
   vP.addEventListener('pointermove', e => {
     if (!v3) return;
     const dx = e.clientX - v3.x, dy = e.clientY - v3.y, t = settings.asmr3d;
     if (!v3.moved && Math.hypot(dx, dy) < 6) return;
     v3.moved = v3Drag = true;
-    if (v3.move) { t.tx = clamp(v3.tx + dx / innerWidth, -0.9, 0.9); t.ty = clamp(v3.ty + dy / innerHeight, -0.9, 0.9); }
+    if (v3.inside) { t.tx = clamp(v3.tx + dx / innerWidth, -0.9, 0.9); t.ty = clamp(v3.ty + dy / innerHeight, -0.9, 0.9); }
     else { t.ry = clamp(v3.ry + dx * 0.12, -45, 45); t.rx = clamp(v3.rx - dy * 0.12, -30, 30); }
     v3Apply();
   });
   const v3End = e => {
     if (!v3) return; const d = v3; v3 = null; vP.classList.remove('grab');
-    try { vP.releasePointerCapture(e.pointerId); } catch {}
-    if (d.moved) save(); else if (d.t === vP) vSetMode(vPrev);       // 背景をクリック → 戻る
+    try { v3Cap().releasePointerCapture(e.pointerId); } catch {}
+    if (d.moved) save();
+    else if (d.inside) vEl.paused ? vEl.play().catch(() => {}) : vEl.pause();      // パネルをちょんと押す → 再生／一時停止
+    else vSetMode(vPrev);                                                          // 背景をちょんと押す → 戻る
   };
   vP.addEventListener('pointerup', v3End); vP.addEventListener('pointercancel', v3End);
-  vP.addEventListener('click', e => { if (v3Drag) { v3Drag = false; e.stopPropagation(); e.preventDefault(); } }, true);   // ドラッグ後の click は再生／停止にしない
   const v3Size = v => { settings.asmr3d.sc = clamp(Math.round(v), 30, 130); $('#vSize').value = settings.asmr3d.sc; v3Apply(); clearTimeout(v3Size.t); v3Size.t = setTimeout(save, 400); };
   $('#vSize').addEventListener('input', e => v3Size(+e.target.value));
   vP.addEventListener('wheel', e => { if (vMode !== 'd3' || e.target.closest('.vCtl')) return; e.preventDefault(); v3Size(settings.asmr3d.sc - e.deltaY * 0.06); }, { passive: false });
@@ -3591,7 +3610,7 @@
     vEl.pause(); vEl.removeAttribute('src'); vEl.load();
     vP.classList.remove('show', 'mini', 'bg', 'd3', 'grab', 'act', 'drag'); vMode = 'win'; vP.style.left = ''; vP.style.top = '';
     if (vUrlObj) { URL.revokeObjectURL(vUrlObj); vUrlObj = null; }
-    vCur = null; document.body.classList.remove('vbg');
+    vCur = null; document.body.classList.remove('vbg'); vBehindApply();
   }
   vP.addEventListener('click', async e => {
     const sk = e.target.closest('[data-skip]'); if (sk) { vSkip(+sk.dataset.skip); return; }
@@ -3602,7 +3621,8 @@
     else if (k === 'mini') vSetMode(vMode === 'mini' ? 'win' : 'mini');
     else if (k === 'bg') vSetMode('bg');
     else if (k === 'd3') vSetMode('d3');
-    else if (k === 'd3reset') { Object.assign(settings.asmr3d, D3); $('#vRefl').value = D3.refl; $('#vSize').value = D3.sc; v3Apply(); save(); }
+    else if (k === 'd3behind') { settings.asmr3d.behind = settings.asmr3d.behind ? 0 : 1; save(); vBehindApply(); }
+    else if (k === 'd3reset') { const bh = settings.asmr3d.behind; Object.assign(settings.asmr3d, D3, { behind: bh }); $('#vRefl').value = D3.refl; $('#vSize').value = D3.sc; v3Apply(); save(); }
     else if (k === 'back') vSetMode(vPrev);
     else if (k === 'full') { (vEl.requestFullscreen || vEl.webkitEnterFullscreen || vEl.webkitRequestFullscreen)?.call(vEl); }
     else if (k === 'close') vClose();
