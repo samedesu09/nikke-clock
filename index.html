@@ -46,7 +46,7 @@
   .slot.glitch .fx { display: block; }
   .slot { transition: left .35s ease, width .35s ease, transform .32s ease; }
   .slot .hosts { transform-origin: 50% 100%; transition: transform .6s ease, filter .6s ease; }
-  .slot.back .hosts { transform: scale(var(--bs, .95)); filter: brightness(var(--bb, .86)) saturate(.95); }
+  .slot.back .hosts { transform: scale(var(--bs, 1)); filter: brightness(var(--bb, 1)); }
   body.panel-open .slot .frame { display: none !important; }
   .slot .pfx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
   /* キュート演出 */
@@ -490,7 +490,7 @@
     display: none; gap: 14px; }
   body.menu-open #menu { display: flex; }
   .mbtn { border: 0; padding: 0; background: none; cursor: pointer; color: #e6fbff; animation: gin .55s steps(1) both; }
-  .mbtn:nth-child(2) { animation-delay: .08s; } .mbtn:nth-child(3) { animation-delay: .16s; }
+  .mbtn:nth-child(2) { animation-delay: .08s; } .mbtn:nth-child(3) { animation-delay: .16s; } .mbtn:nth-child(4) { animation-delay: .24s; }
   body.menu-closing .mbtn { animation: gout .28s steps(1) both; }
   .mface { display: grid; place-items: center; width: clamp(110px, 18vw, 170px); height: 70px; font: 600 16px "Oxanium", "Hiragino Sans", sans-serif;
     letter-spacing: .15em; background: linear-gradient(135deg, rgba(20,30,46,.85), rgba(8,12,20,.85));
@@ -724,6 +724,43 @@
 
   .mNote { display: none; font-size: 10px; color: rgba(223,255,255,.5); margin-top: 8px; line-height: 1.5; }
   body.am-mode .mNote { display: block; }
+
+  /* ===== ASMR（動画） ===== */
+  #asmr { position: fixed; inset: 0; z-index: 82; display: none; align-items: center; justify-content: center; background: rgba(2,6,12,.55); backdrop-filter: blur(3px); }
+  #asmr.open { display: flex; animation: jbIn .35s ease; }
+  #asmr .jbWin { height: min(640px, 86vh); }
+  #asmr .jbLogo { color: #ff8fd0; text-shadow: 0 0 12px rgba(255,120,200,.6); }
+  #vGrid { flex: 1; overflow-y: auto; padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; align-content: start; }
+  .vCard { cursor: pointer; position: relative; }
+  .vCard .vThumb { aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #0b1322 center / cover no-repeat; border: 1px solid rgba(255,143,208,.3); position: relative; transition: box-shadow .15s, transform .15s; }
+  .vCard:hover .vThumb { transform: translateY(-2px); box-shadow: 0 0 16px rgba(255,143,208,.5); }
+  .vCard .vThumb::after { content: "▶"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 26px; color: #fff; text-shadow: 0 0 12px rgba(0,0,0,.8); opacity: .0; transition: opacity .15s; }
+  .vCard:hover .vThumb::after { opacity: .9; }
+  .vCard .vDur { position: absolute; right: 6px; bottom: 6px; font: 600 10px "Oxanium", sans-serif; background: rgba(0,0,0,.7); color: #fff; padding: 2px 6px; border-radius: 4px; }
+  .vCard b { display: block; font-size: 12px; margin-top: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .vCard small { font: 500 10px "Oxanium", sans-serif; color: rgba(223,255,255,.5); }
+  .vCard .jbDel { position: absolute; right: 6px; top: 6px; width: 24px; height: 24px; border-radius: 50%; border: 0; background: rgba(0,0,0,.65); color: #fff; cursor: pointer; font-size: 11px; }
+  #vPlayer { position: fixed; z-index: 84; display: none; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(1100px, 92vw); color: #eaf9ff;
+    background: rgba(4,8,16,.92); border: 1px solid rgba(255,143,208,.5); box-shadow: 0 0 40px rgba(255,120,200,.2);
+    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px)); transition: width .35s, left .35s, top .35s, transform .35s; }
+  #vPlayer.show { display: block; }
+  #vPlayer.mini { width: min(380px, 60vw); left: auto; top: auto; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); transform: none; }
+  #vPlayer video { display: block; width: 100%; max-height: 72vh; background: #000; }
+  #vPlayer.mini video { max-height: 30vh; }
+  .vTop { display: flex; align-items: center; gap: 8px; padding: 8px 12px; font-size: 12px; }
+  .vTop b { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .vTop small { font: 600 9px "Oxanium", sans-serif; letter-spacing: .22em; color: #ff8fd0; }
+  .vCtl { display: flex; align-items: center; gap: 8px; padding: 8px 12px 10px; }
+  .vCtl button, .vTop button { height: 30px; min-width: 30px; padding: 0 8px; border: 1px solid rgba(255,143,208,.45); background: rgba(255,143,208,.08); color: #fff; cursor: pointer; font-size: 12px;
+    clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px); }
+  .vCtl button.on { background: rgba(255,143,208,.32); }
+  .vCtl .vBar { flex: 1; position: relative; height: 16px; cursor: pointer; touch-action: none; }
+  .vCtl .vBar::before { content: ""; position: absolute; left: 0; right: 0; top: 7px; height: 2px; background: rgba(255,143,208,.25); }
+  .vCtl .vBar i { position: absolute; left: 0; top: 7px; height: 2px; width: 0; background: linear-gradient(90deg, #ff8fd0, #5fe0ff); box-shadow: 0 0 8px rgba(255,143,208,.8); }
+  .vCtl .vBar b { position: absolute; top: 3px; width: 10px; height: 10px; margin-left: -5px; left: 0; background: #fff; transform: rotate(45deg); }
+  .vCtl .vTime { font: 500 11px "Oxanium", sans-serif; color: rgba(223,255,255,.7); min-width: 84px; text-align: center; }
+  .vCtl input[type=range] { width: 90px; accent-color: #ff8fd0; }
+  #vPlayer.mini .vCtl input[type=range], #vPlayer.mini .vTime { display: none; }
 </style>
 </head>
 <body class="idle">
@@ -746,6 +783,7 @@
 
 <div id="btns">
   <button class="cbtn" id="shuffleBtn" title="お気に入りからランダムに切り替え" hidden></button>
+  <button class="cbtn" id="asmrBtn" title="ASMR（動画）"></button>
   <button class="cbtn" id="jbBtn" title="ジュークボックス"></button>
   <button class="cbtn" id="fsBtn" title="全画面"></button>
   <button class="cbtn" id="setBtn" title="設定"></button>
@@ -761,6 +799,7 @@
   <button class="mbtn" data-open="clock"><span class="mface"><small>CLOCK</small>時計</span></button>
   <button class="mbtn" data-open="cal"><span class="mface"><small>CALENDAR</small>カレンダー</span></button>
   <button class="mbtn" data-open="view"><span class="mface"><small>DISPLAY</small>表示設定</span></button>
+  <button class="mbtn" data-open="more"><span class="mface"><small>ADVANCED</small>詳細設定</span></button>
 </nav>
 
 <!-- 単独配置のカレンダー -->
@@ -989,6 +1028,34 @@
   sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"></iframe></div>
 </div>
 
+<div id="asmr">
+  <div class="jbWin">
+    <div class="jbHead">
+      <span class="jbLogo">ASMR</span><span class="jbSub">VIDEO LIBRARY // この端末に保存</span>
+      <button class="jbX" id="asmrClose" title="閉じる">✕</button>
+    </div>
+    <div id="vGrid"></div>
+    <div class="jbFoot">
+      <button id="vAddFile">＋ 動画ファイルを追加</button>
+      <input type="file" id="vFile" accept="video/*,.mp4,.mov,.m4v,.webm" multiple style="display:none">
+      <input id="vUrl" type="text" placeholder="動画のURL（GitHubに置いた mp4 など）を貼って追加">
+      <button id="vAddUrl">URLで追加</button>
+      <div class="note" id="vNote"><b>ASMR</b><span>動画をタップで再生。追加したファイルはこの端末（ブラウザ）に保存され、次回もすぐ選べます</span></div>
+    </div>
+  </div>
+</div>
+<div id="vPlayer">
+  <div class="vTop"><small>NOW PLAYING</small><b id="vTitle"></b><button data-v="mini" title="小窓／大きく">▭</button><button data-v="full" title="全画面">⛶</button><button data-v="close" title="閉じる">✕</button></div>
+  <video id="vEl" playsinline preload="metadata"></video>
+  <div class="vCtl">
+    <button data-v="play" title="再生／一時停止">▶</button>
+    <div class="vBar" id="vBar"><i></i><b></b></div>
+    <span class="vTime" id="vTime">0:00 / 0:00</span>
+    <button data-v="loop" title="くり返し">⟲</button>
+    <span style="font-size:13px">🔈</span><input type="range" id="vVol" min="0" max="100" step="1">
+  </div>
+</div>
+
 <script>
 (() => {
   const L2D = 'https://nikke-db-legacy.pages.dev/l2d/';
@@ -1203,6 +1270,7 @@
     const sec = b.dataset.open;
     closeMenu();
     if (sec === 'view') { body.classList.add('edit'); layout(); }   // キャラの枠を編集できる状態に
+    else if (sec === 'more') openPanel('view');                      // 詳しい設定パネルを直接開く
     else openPanel(sec);
   });
   $('#closeBtn').onclick = closePanel;
@@ -1384,8 +1452,8 @@
     mark('#pairOn', c.on); mark('#pairAuto', c.auto || '0');
     $('#grpFront').innerHTML = has ? c.order.map(id => `<button data-v="${esc(id)}" class="${id === c.front ? 'on' : ''}">${esc(nameOf(id))}</button>`).join('') : '';
     gapIn.value = c.gap; $('#pairGapV').textContent = c.gap;
-    $('#pairBs').value = c.bscale ?? 95; $('#pairBsV').textContent = $('#pairBs').value + '%';
-    $('#pairBd').value = c.bdim ?? 14; $('#pairBdV').textContent = $('#pairBd').value + '%';
+    $('#pairBs').value = c.bscale ?? 100; $('#pairBsV').textContent = $('#pairBs').value + '%';
+    $('#pairBd').value = c.bdim ?? 0; $('#pairBdV').textContent = $('#pairBd').value + '%';
   }
   const grpSet = fn => { const cfg = ensureGrp(); if (!cfg) return; fn(cfg); if (!editingGrp()) save(); layout(); };
   $('#pairOn').addEventListener('click', e => { const v = e.target.dataset.v; if (v) grpSet(c => { c.on = v; }); resetSwap(); });
@@ -1546,7 +1614,7 @@
   const editingGrp = () => body.classList.contains('pair-edit');
   function newCfg() {
     const ids = slots.map(s => s.cur.item[0]);
-    return { on: '1', gap: 40, order: ids, front: ids[Math.floor(ids.length / 2)] || ids[0], auto: '0', bscale: 95, bdim: 14 };
+    return { on: '1', gap: 40, order: ids, front: ids[Math.floor(ids.length / 2)] || ids[0], auto: '0', bscale: 100, bdim: 0 };
   }
   function getDraft() {
     const k = grpKey(); if (!k) return null;
@@ -1557,6 +1625,7 @@
   function ensureGrp() { return editingGrp() ? getDraft() : grpCfg(); }
   const isGroup = () => grpCfg()?.on === '1' && (!body.classList.contains('edit') || body.classList.contains('panel-open') || body.classList.contains('pair-edit'));
   const isSolo = () => !isGroup() && settings.solo === '1' && slots.length > 1 && innerWidth / innerHeight < 1.2 && !body.classList.contains('edit') && !body.classList.contains('pair-edit');
+  for (const g of Object.values(settings.groups || {})) { if (g && (g.bscale ?? 95) === 95 && (g.bdim ?? 14) === 14 && !g.bfix) { g.bscale = 100; g.bdim = 0; g.bfix = 1; } }
   const BASE = { 1: [[25, 50]], 2: [[10, 44], [46, 44]], 3: [[2, 34], [33, 34], [64, 34]] };
   function layout() {
     const solo = isSolo();
@@ -1578,8 +1647,8 @@
         s.el.style.zIndex = 10 - Math.abs(k - fk);
         if (k !== fk) {
           s.el.classList.add('back');
-          s.el.style.setProperty('--bs', (cfg.bscale ?? 95) / 100);
-          s.el.style.setProperty('--bb', 1 - (cfg.bdim ?? 14) / 100);
+          s.el.style.setProperty('--bs', (cfg.bscale ?? 100) / 100);
+          s.el.style.setProperty('--bb', 1 - (cfg.bdim ?? 0) / 100);
         }
       });
     }
@@ -1894,13 +1963,17 @@
   $('#footDone').addEventListener('click', endFootAdj);
   addEventListener('keydown', e => { if (e.key === 'Escape' && adjSlot) endFootAdj(); });
   const shc = $('#shadows'), shx = shc.getContext('2d');
-  // 影：足の位置は3フレームに1回読み取り、描画は毎フレーム。前回の位置からなめらかに追いかけるのでカクつかない
+  // 影：足の位置は2フレームに1回読み取り、描画は毎フレーム。目標位置へ時間基準でなめらかに追いかける。
+  // 出てくるとき・消えるときはゆっくりフェード。一瞬見失っても0.4秒は待ってから消し始める
+  let shLast = performance.now();
   (function shadowLoop() {
     requestAnimationFrame(shadowLoop);
     if (settings.floorOn !== '1') return;
     const W = shc.clientWidth, H = shc.clientHeight; if (!W) return;
     if (shc.width !== W || shc.height !== H) { shc.width = W; shc.height = H; }
-    const scan = ++footFrame % 3 === 0;
+    const now = performance.now(), dt = Math.min(100, now - shLast); shLast = now;
+    const kPos = 1 - Math.exp(-dt / 140), kSize = 1 - Math.exp(-dt / 220), kIn = 1 - Math.exp(-dt / 380), kOut = 1 - Math.exp(-dt / 480);
+    const scan = ++footFrame % 2 === 0;
     const stageH = $('#stage').clientHeight, floorY = $('#stage').getBoundingClientRect().bottom;
     shx.clearRect(0, 0, W, H);
     for (const s of slots) {
@@ -1923,27 +1996,28 @@
               rx: (f.w * 0.6 + 14) * (0.6 + 0.4 * k) * (ground ? 1 - f.gap / stageH : 1), ry: 7 * (0.5 + 0.5 * k), a: 0.5 * k });
           }
         }
-        // 前回の影と、近いもの同士で対応づける（新しく出た影は薄い状態から、消えた影はフェードアウト）
         const used = new Set();
         for (const sh of st) {
-          let best = -1, bd = 80;
+          let best = -1, bd = 140;
           targets.forEach((t, i) => { if (used.has(i)) return; const d = Math.abs(t.x - sh.x) + Math.abs(t.y - sh.y) * 0.5; if (d < bd) { bd = d; best = i; } });
-          if (best >= 0) { used.add(best); sh.t = targets[best]; } else sh.t = { ...sh, a: 0 };
+          if (best >= 0) { used.add(best); sh.t = targets[best]; sh.miss = 0; }
+          else if (!live) sh.t = { ...sh.t, a: 0 };
+          else { sh.miss = sh.miss || now; if (now - sh.miss > 400) sh.t = { ...sh.t, a: 0 }; }   // 少し待ってから消す
         }
-        targets.forEach((t, i) => { if (!used.has(i)) st.push({ ...t, a: 0, t }); });
+        targets.forEach((t, i) => { if (!used.has(i)) st.push({ ...t, rx: t.rx * 0.6, a: 0, t, miss: 0 }); });   // 小さく薄い状態から出てくる
       }
       for (let i = st.length - 1; i >= 0; i--) {
         const sh = st[i], t = sh.t; if (!t) continue;
-        const f = 0.22;                                      // 追いかける速さ（小さいほどゆったり）
-        sh.x += (t.x - sh.x) * f; sh.y += (t.y - sh.y) * f; sh.rx += (t.rx - sh.rx) * f; sh.ry += (t.ry - sh.ry) * f; sh.a += (t.a - sh.a) * 0.18;
-        if (t.a === 0 && sh.a < 0.01) { st.splice(i, 1); continue; }
-        if (sh.rx < 1) continue;
-        // やわらかい楕円の影：中心は濃く、外側へなだらかに消える
+        sh.x += (t.x - sh.x) * kPos; sh.y += (t.y - sh.y) * kPos;
+        sh.rx += (t.rx - sh.rx) * kSize; sh.ry += (t.ry - sh.ry) * kSize;
+        sh.a += (t.a - sh.a) * (t.a > sh.a ? kIn : kOut);
+        if (t.a === 0 && sh.a < 0.004) { st.splice(i, 1); continue; }
+        if (sh.rx < 1 || sh.a < 0.002) continue;
         const g = shx.createRadialGradient(sh.x, sh.y, 0, sh.x, sh.y, sh.rx);
-        g.addColorStop(0, `rgba(0,0,0,${sh.a})`); g.addColorStop(0.35, `rgba(0,0,0,${sh.a * 0.7})`);
-        g.addColorStop(0.7, `rgba(0,0,0,${sh.a * 0.25})`); g.addColorStop(1, 'rgba(0,0,0,0)');
-        shx.save(); shx.translate(sh.x, sh.y); shx.scale(1, sh.ry * 1.25 / sh.rx); shx.translate(-sh.x, -sh.y);
-        shx.fillStyle = g; shx.beginPath(); shx.arc(sh.x, sh.y, sh.rx * 1.15, 0, Math.PI * 2); shx.fill(); shx.restore();
+        g.addColorStop(0, `rgba(0,0,0,${sh.a})`); g.addColorStop(0.3, `rgba(0,0,0,${sh.a * 0.75})`);
+        g.addColorStop(0.62, `rgba(0,0,0,${sh.a * 0.3})`); g.addColorStop(0.85, `rgba(0,0,0,${sh.a * 0.08})`); g.addColorStop(1, 'rgba(0,0,0,0)');
+        shx.save(); shx.translate(sh.x, sh.y); shx.scale(1, sh.ry * 1.3 / sh.rx); shx.translate(-sh.x, -sh.y);
+        shx.fillStyle = g; shx.beginPath(); shx.arc(sh.x, sh.y, sh.rx * 1.2, 0, Math.PI * 2); shx.fill(); shx.restore();
       }
     }
   })();
@@ -2000,7 +2074,7 @@
   // キャラの大きさ・位置に合わせて、絵を描く領域（キャンバス）を広げる
   //  ふだんは枠の130%幅。はみ出すほど大きく／横にずらしたときは画面の横幅いっぱい＋上方向にも伸ばす
   function sizeHosts(s, k) {
-    const c = s.cur, B = c && c.bounds; if (!B || !isFinite(k)) return;
+    const c = s.cur, B = c && c.bounds; if (!B || !isFinite(k) || c.measuring) return;
     const SW = s.el.clientWidth, SH = s.el.clientHeight, stW = $('#stage').clientWidth; if (!SW || !SH) return;
     const id = c.item[0], y = settings.yMap[id] || 0, xPx = (settings.xMap[id] || 0) / 100 * SH;
     const lift = Math.max(0, y) / 100 * SH, drop = y < 0 ? -y / 100 * SH : 0;
@@ -2016,7 +2090,7 @@
     s.hostsEl.style.transformOrigin = `${SW / 2 + xPx - hl}px 100%`;   // 手前・奥の縮小はキャラの足元基準
   }
   function applyScale(c, k) {
-    const B = c && c.bounds; if (!B || !isFinite(k)) return;
+    const B = c && c.bounds; if (!B || !isFinite(k) || c.measuring) return;   // 大きさを測っている最中は触らない
     const hostsEl = c.host.parentElement, slotEl = c.host.closest('.slot');
     const W = hostsEl.clientWidth, H = hostsEl.clientHeight; if (!W || !H || !slotEl) return;
     const SW = slotEl.clientWidth, SH = slotEl.clientHeight;
@@ -2053,24 +2127,42 @@
   }
   addEventListener('resize', () => { layout(); refitAll(); });
   // 実際に描かれた絵の範囲（上下左右）を調べて、それを基準に大きさと足元を合わせる
-  const nextFrame = () => new Promise(r => requestAnimationFrame(() => r()));
+  // 次の描画フレームまで待つ（裏のタブなどで描画が止まっていても、0.12秒で先へ進む）
+  const nextFrame = () => new Promise(r => { let d = false; const go = () => { if (!d) { d = true; r(); } }; requestAnimationFrame(go); setTimeout(go, 120); });
+  // 実際に描かれた絵の範囲を測って、大きさと足元の基準にする。
+  // 拡大したキャラをそのまま測ると画面からはみ出した部分が欠けて「小さい」と誤認し、さらに巨大化してしまうので、
+  // 測るときだけ一時的に「全身がキャンバスに余裕をもって収まる」表示にしてから測る（読み込み中は非表示なので見えない）
   async function snapFeet(c) {
-    await nextFrame(); await nextFrame();
-    const src = c.host.querySelector('canvas'); if (!src || !src.width) return;
+    const B = c.bounds, p = c.player, host = c.host;
+    if (!B || !B.width || !B.height) return;
+    await nextFrame();
+    const W = host.clientWidth, H = host.clientHeight; if (!W || !H) return;
+    const k = Math.min(W * 0.8 / B.width, H * 0.8 / B.height), vw = W / k, vh = H / k;
+    const v = { x: B.x + B.width / 2 - vw / 2, y: B.y + B.height / 2 - vh / 2, width: vw, height: vh,
+      padLeft: 0, padRight: 0, padTop: 0, padBottom: 0, transitionTime: 0, animations: {} };
+    c.measuring = true;
+    p.config.viewport = v;
+    const cur = p.animationState.getCurrent(0); if (cur) p.setViewport(cur.animation);
+    await nextFrame(); await nextFrame(); await nextFrame();
+    c.measuring = false;
+    const src = host.querySelector('canvas'); if (!src || !src.width) { refitAll(); return; }
     const w = 160, h = Math.max(8, Math.round(160 * src.height / src.width));
     const off = document.createElement('canvas'); off.width = w; off.height = h;
     const x = off.getContext('2d', { willReadFrequently: true });
-    try { x.drawImage(src, 0, 0, w, h); } catch { return; }
-    let d; try { d = x.getImageData(0, 0, w, h).data; } catch { return; }
+    let d;
+    try { x.drawImage(src, 0, 0, w, h); d = x.getImageData(0, 0, w, h).data; } catch { refitAll(); return; }
     let top = h, bot = -1, lft = w, rgt = -1;
     for (let y = 0; y < h; y++) for (let i = 0; i < w; i++) if (d[(y * w + i) * 4 + 3] > 40) {
       if (y < top) top = y; if (y > bot) bot = y; if (i < lft) lft = i; if (i > rgt) rgt = i;
     }
-    if (bot < 0) return;
-    const v = c.player.config.viewport;   // キャンバス全体 = この範囲（縦横比は一致させてある）
-    const wx = px => v.x + px / w * v.width, wy = py => v.y + (1 - py / h) * v.height;
-    const mx = 0.02 * v.width;            // 少しだけ余裕
-    c.bounds = { x: wx(lft) - mx, width: wx(rgt + 1) - wx(lft) + 2 * mx, y: wy(bot + 1), height: wy(top) - wy(bot + 1) };
+    const touches = top <= 0 || lft <= 0 || bot >= h - 1 || rgt >= w - 1;   // 端に触れている＝はみ出していて正しく測れていない
+    if (bot >= 0 && !touches) {
+      const wx = px => v.x + px / w * v.width, wy = py => v.y + (1 - py / h) * v.height;
+      const mx = 0.02 * v.width;
+      const nb = { x: wx(lft) - mx, width: wx(rgt + 1) - wx(lft) + 2 * mx, y: wy(bot + 1), height: wy(top) - wy(bot + 1) };
+      // 念のため：もとの範囲から極端に違う（3割未満・1.5倍超）ときは測り間違いとみなして使わない
+      if (nb.height > B.height * 0.3 && nb.height < B.height * 1.5 && nb.width > 0) c.bounds = nb;
+    }
     refitAll();
   }
 
@@ -2130,11 +2222,16 @@
       // 表情の候補：待機・会話・切り替え用・怒り顔以外の動き（expression_0 / delight / shy / think など）
       const pool = c.names.filter(n => n !== c.pick && !/^idle$|talk|^to_|^aim|^cover|reload|hit|stun|angry/i.test(n));
       if (!pool.length) return;
-      const pick = pool[Math.random() * pool.length | 0];
+      // shy（照れ顔）は他の表情の3倍出やすくする
+      const weights = pool.map(n => /shy/i.test(n) ? 3 : 1), total = weights.reduce((a, b) => a + b, 0);
+      let r = Math.random() * total, pick = pool[pool.length - 1];
+      for (let i = 0; i < pool.length; i++) { r -= weights[i]; if (r < 0) { pick = pool[i]; break; } }
+      // 表情は「トラック1」に重ねて再生する。トラック0の待機モーションはそのまま動かし続けるので、
+      // 表情の切り替えで体が初期ポーズに一瞬戻る（位置がリセットされたように見える）ことがない
       const st = c.player.animationState;
-      st.data.defaultMix = 0.25;
-      st.setAnimation(0, pick, false);
-      st.addAnimation(0, c.pick, true, 0);
+      st.setEmptyAnimation(1, 0);
+      const e1 = st.addAnimation(1, pick, false, 0); if (e1) e1.mixDuration = 0.35;
+      st.addEmptyAnimation(1, 0.45, 0);
     });
   }
 
@@ -3231,6 +3328,118 @@
       }
     })();
   })();
+
+
+  // ================= ASMR（動画ライブラリ） =================
+  // 追加した動画ファイルはブラウザ内（IndexedDB）に保存するので、次回も選ぶだけで再生できる（端末ごと）。
+  // URL で追加したもの（GitHub Pages に置いた mp4 など）は設定に保存されるので、書き出し→読み込みで他の端末にも移る
+  GLYPH.phones = '<path d="M6.5 14.5v-2.2a5.5 5.5 0 0 1 11 0v2.2"/><path d="M6.5 13.5h1.8v4H6.5zM15.7 13.5h1.8v4h-1.8z"/>';
+  $('#asmrBtn').innerHTML = cyber(GLYPH.phones);
+  if (!Array.isArray(settings.asmrUrls)) settings.asmrUrls = [];
+  if (settings.asmrVol == null) settings.asmrVol = 80;
+  const vdb = (() => { let p; return () => p || (p = new Promise((res, rej) => { const r = indexedDB.open('nclock-asmr', 1); r.onupgradeneeded = () => r.result.createObjectStore('videos', { keyPath: 'id' }); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); })); })();
+  const vtx = async (mode, fn) => { const db = await vdb(); return new Promise((res, rej) => { const t = db.transaction('videos', mode); const st = t.objectStore('videos'); const out = fn(st); t.oncomplete = () => res(out && out.result !== undefined ? out.result : out); t.onerror = () => rej(t.error); }); };
+  const vAll = async () => { try { return await vtx('readonly', st => st.getAll()); } catch { return []; } };
+  let vList = [], vCur = null, vUrlObj = null;
+  const vFmt = sec => { sec = Math.max(0, Math.floor(sec || 0)); const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s2 = sec % 60; return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(s2).padStart(2, '0'); };
+  // サムネイルと長さを作る（動画の1割あたりの場面）
+  function vProbe(src) {
+    return new Promise(res => {
+      const v = document.createElement('video'); v.muted = true; v.preload = 'metadata'; v.playsInline = true; v.crossOrigin = 'anonymous';
+      let done = false; const fin = (thumb) => { if (done) return; done = true; res({ thumb, dur: v.duration || 0 }); v.src = ''; };
+      v.onloadedmetadata = () => { try { v.currentTime = Math.min(10, (v.duration || 10) * 0.1); } catch { fin(''); } };
+      v.onseeked = () => { try { const c = document.createElement('canvas'), w = 320; c.width = w; c.height = Math.round(w * (v.videoHeight || 9) / (v.videoWidth || 16)); c.getContext('2d').drawImage(v, 0, 0, c.width, c.height); fin(c.toDataURL('image/jpeg', 0.75)); } catch { fin(''); } };
+      v.onerror = () => fin('');
+      setTimeout(() => fin(''), 8000);
+      v.src = src;
+    });
+  }
+  async function vRender() {
+    vList = (await vAll()).sort((a, b) => b.added - a.added);
+    const urls = settings.asmrUrls.map(u => ({ ...u, url: true }));
+    const all = [...vList, ...urls];
+    $('#vGrid').innerHTML = all.length ? all.map(v => `
+      <div class="vCard" data-id="${esc2(v.id)}">
+        <div class="vThumb" style="background-image:url('${v.thumb || ''}')"><span class="vDur">${vFmt(v.dur)}</span></div>
+        <b title="${esc2(v.name)}">${esc2(v.name)}</b><small>${v.url ? 'URL' : ((v.size || 0) / 1048576).toFixed(0) + ' MB'}</small>
+        <button class="jbDel" title="削除">✕</button>
+      </div>`).join('') : '<div class="jbEmpty">まだ動画がありません。下の「＋ 動画ファイルを追加」から選んでください（mp4 など）。</div>';
+  }
+  $('#asmrBtn').addEventListener('click', () => { $('#asmr').classList.add('open'); vRender(); });
+  $('#asmrClose').addEventListener('click', () => $('#asmr').classList.remove('open'));
+  $('#asmr').addEventListener('click', e => { if (e.target.id === 'asmr') $('#asmr').classList.remove('open'); });
+  $('#vAddFile').addEventListener('click', () => $('#vFile').click());
+  $('#vFile').addEventListener('change', async e => {
+    const files = [...e.target.files]; e.target.value = '';
+    for (const f of files) {
+      $('#vGrid').insertAdjacentHTML('afterbegin', `<div class="jbEmpty">「${esc2(f.name)}」を取り込み中…</div>`);
+      const u = URL.createObjectURL(f), info = await vProbe(u); URL.revokeObjectURL(u);
+      try { await vtx('readwrite', st => st.put({ id: 'v' + Date.now() + Math.random().toString(36).slice(2, 6), name: f.name.replace(/\.[^.]+$/, ''), blob: f, size: f.size, type: f.type, thumb: info.thumb, dur: info.dur, added: Date.now() })); }
+      catch { alert('保存できませんでした（端末の空き容量やブラウザの制限の可能性があります）'); }
+    }
+    vRender();
+  });
+  $('#vAddUrl').addEventListener('click', async () => {
+    const url = $('#vUrl').value.trim(); if (!/^https?:\/\/|^[\w./-]+\.(mp4|m4v|mov|webm)$/i.test(url)) { alert('動画ファイルのURLを貼ってください'); return; }
+    const info = await vProbe(url);
+    settings.asmrUrls.unshift({ id: 'u' + Date.now(), name: decodeURIComponent(url.split('/').pop().replace(/\.[^.]+$/, '')) || '動画', src: url, thumb: info.thumb, dur: info.dur, added: Date.now() });
+    save(); $('#vUrl').value = ''; vRender();
+  });
+  $('#vGrid').addEventListener('click', async e => {
+    const card = e.target.closest('.vCard'); if (!card) return;
+    const id = card.dataset.id;
+    if (e.target.closest('.jbDel')) {
+      if (!confirm('この動画を一覧から削除しますか？')) return;
+      if (id[0] === 'u') { settings.asmrUrls = settings.asmrUrls.filter(x => x.id !== id); save(); }
+      else await vtx('readwrite', st => st.delete(id));
+      vRender(); return;
+    }
+    const v = vList.find(x => x.id === id) || settings.asmrUrls.find(x => x.id === id); if (!v) return;
+    vPlay(v); $('#asmr').classList.remove('open');
+  });
+  const vEl = $('#vEl'), vP = $('#vPlayer');
+  vEl.volume = settings.asmrVol / 100; $('#vVol').value = settings.asmrVol;
+  vEl.loop = !!settings.asmrLoop; vP.querySelector('[data-v=loop]').classList.toggle('on', vEl.loop);
+  function vPlay(v) {
+    if (vUrlObj) { URL.revokeObjectURL(vUrlObj); vUrlObj = null; }
+    const src = v.blob ? (vUrlObj = URL.createObjectURL(v.blob)) : v.src;
+    vCur = v; $('#vTitle').textContent = v.name;
+    vEl.src = src; vP.classList.add('show'); vP.classList.remove('mini');
+    try { audio.pause(); } catch {}          // ジュークボックスの試聴は止める
+    vEl.play().catch(() => {});
+  }
+  const vUpd = () => { const d = vEl.duration || 0, c = vEl.currentTime || 0, f = d ? c / d : 0;
+    $('#vBar i').style.width = f * 100 + '%'; $('#vBar b').style.left = f * 100 + '%'; $('#vTime').textContent = `${vFmt(c)} / ${vFmt(d)}`;
+    vP.querySelector('[data-v=play]').textContent = vEl.paused ? '▶' : '❚❚'; };
+  ['timeupdate', 'play', 'pause', 'loadedmetadata'].forEach(ev => vEl.addEventListener(ev, vUpd));
+  // 取り込み時にサムネイル・長さが取れなかった動画は、再生したときに補って保存する
+  vEl.addEventListener('timeupdate', async () => {
+    const v = vCur; if (!v || (v.thumb && v.dur) || vEl.currentTime < 1 || v._fixing) return;
+    v._fixing = true;
+    try {
+      const c = document.createElement('canvas'), w = 320; c.width = w; c.height = Math.round(w * (vEl.videoHeight || 9) / (vEl.videoWidth || 16));
+      c.getContext('2d').drawImage(vEl, 0, 0, c.width, c.height);
+      if (!v.thumb) v.thumb = c.toDataURL('image/jpeg', 0.75);
+    } catch {}
+    v.dur = v.dur || vEl.duration || 0;
+    const { _fixing, url, ...rec } = v;
+    try { if (v.blob) await vtx('readwrite', st => st.put(rec)); else { const u = settings.asmrUrls.find(x => x.id === v.id); if (u) { u.thumb = v.thumb; u.dur = v.dur; save(); } } } catch {}
+  });
+  const vSeek = e => { const r = $('#vBar').getBoundingClientRect(); if (vEl.duration) vEl.currentTime = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)) * vEl.duration; };
+  $('#vBar').addEventListener('pointerdown', e => { $('#vBar').setPointerCapture(e.pointerId); vSeek(e); const mv = ev => vSeek(ev), up = () => { $('#vBar').removeEventListener('pointermove', mv); $('#vBar').removeEventListener('pointerup', up); }; $('#vBar').addEventListener('pointermove', mv); $('#vBar').addEventListener('pointerup', up); });
+  $('#vVol').addEventListener('input', e => { settings.asmrVol = +e.target.value; vEl.volume = settings.asmrVol / 100; clearTimeout(e.target.t); e.target.t = setTimeout(save, 400); });
+  vEl.addEventListener('click', () => vEl.paused ? vEl.play() : vEl.pause());
+  vP.addEventListener('click', e => {
+    const b = e.target.closest('[data-v]'); if (!b) return;
+    const k = b.dataset.v;
+    if (k === 'play') vEl.paused ? vEl.play() : vEl.pause();
+    else if (k === 'loop') { vEl.loop = !vEl.loop; settings.asmrLoop = vEl.loop; save(); b.classList.toggle('on', vEl.loop); }
+    else if (k === 'mini') vP.classList.toggle('mini');
+    else if (k === 'full') { const el = vEl; (el.requestFullscreen || el.webkitEnterFullscreen || el.webkitRequestFullscreen)?.call(el); }
+    else if (k === 'close') { vEl.pause(); vEl.removeAttribute('src'); vEl.load(); vP.classList.remove('show'); if (vUrlObj) { URL.revokeObjectURL(vUrlObj); vUrlObj = null; } vCur = null; }
+  });
+  // 保存容量をできるだけ消されにくくする（対応ブラウザのみ）
+  try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch {}
 
   // ---------- 起動 ----------
   const link = document.createElement('link'); link.rel = 'stylesheet'; link.href = CDN('4.1') + 'spine-player.css'; document.head.appendChild(link);
