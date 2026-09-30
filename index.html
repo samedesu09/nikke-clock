@@ -790,10 +790,11 @@
   #vPlayer.mini .vEqBtn, #vPlayer.mini .vVolBox, #vPlayer.mini .vSkip[data-skip="10"], #vPlayer.mini .vSkip[data-skip="-10"], #vPlayer.mini .vTop [data-v="full"], #vPlayer.mini .vEq { display: none; }
   #vPlayer.mini .vCtl { padding: 6px 10px 10px; }
   /* 壁紙：背景で全面に再生（キャラや時計は手前のまま）。操作は下の小さなバー */
-  #vPlayer.show.bg { display: contents; }
-  #vPlayer.bg video { position: fixed; inset: 0; width: 100vw; height: 100vh; max-height: none; object-fit: cover; z-index: -1; pointer-events: none; background: #000; filter: brightness(var(--vb)); }
+  /* removed: display: contents breaks position:fixed */
+  #vPlayer.show.bg { visibility: hidden; pointer-events: none; }
+  #vPlayer.bg video { position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100vh !important; max-height: none !important; object-fit: cover; z-index: 0 !important; pointer-events: none; background: #000; filter: brightness(var(--vb)); visibility: visible !important; }
   #vPlayer.bg .vTop { display: none; }
-  #vPlayer.bg .vCtl { position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(560px, 94vw); z-index: 95;
+  #vPlayer.bg .vCtl { position: fixed !important; visibility: visible !important; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(560px, 94vw); z-index: 95;
     background: rgba(4,8,16,.74); border: 1px solid rgba(255,143,208,.45); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px)); transition: opacity .5s; }
   #vPlayer.bg:not(.act) .vCtl { opacity: .28; }
@@ -801,7 +802,7 @@
   #vPlayer.bg .vXBtn { display: inline-block; }
   #vPlayer.bg .vBrightBox { display: inline-flex; }
   #vPlayer.bg .vVolBox { margin-left: 0; order: 5; width: 100%; justify-content: center; }
-  #vPlayer.bg .vEq { position: fixed; left: 50%; bottom: calc(max(20px, env(safe-area-inset-bottom)) + 118px); transform: translateX(-50%); width: min(560px, 94vw); z-index: 95;
+  #vPlayer.bg .vEq { position: fixed !important; visibility: visible !important; left: 50%; bottom: calc(max(20px, env(safe-area-inset-bottom)) + 118px); transform: translateX(-50%); width: min(560px, 94vw); z-index: 95;
     background: rgba(4,8,16,.86); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
   #vPlayer.bg.eq .vEq { border: 1px solid rgba(255,143,208,.4); }
 </style>
